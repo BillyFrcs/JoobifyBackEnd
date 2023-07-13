@@ -1,0 +1,38 @@
+{
+  "name": "joobify",
+  "version": "1.0.0",
+  "description": "Joobify BackEnd App Services",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "NODE_ENV=production node app.js",
+    "test": "mocha ./src/tests/test.js --exit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BillyFrcs/Joobify"
+  },
+  "engines": {
+    "node": "18"
+  },
+  "author": "Billy Franscois",
+  "license": "MIT",
+  "dependencies": {
+    "@google-cloud/storage": "^6.10.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "firebase": "^7.24.0",
+    "firebase-admin": "^11.9.0",
+    "formidable-serverless": "^1.1.1",
+    "helmet": "^7.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.42.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "mocha": "^10.2.0",
+    "nodemon": "^2.0.22"
+  }
+}
