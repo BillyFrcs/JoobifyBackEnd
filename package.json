@@ -1,7 +1,7 @@
 {
   "name": "joobify",
   "version": "1.0.0",
-  "description": "Joobify BackEnd App Services",
+  "description": "Joobify BackEnd App Cloud Computing Services",
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/BillyFrcs/Joobify"
+    "url": "https://github.com/BillyFrcs/JoobifyBackEnd"
   },
   "engines": {
     "node": "18"
