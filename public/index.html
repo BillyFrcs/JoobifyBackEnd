@@ -36,7 +36,7 @@
         hr {
             border: none;
             height: 2px;
-            background-color: #4658c6;
+            background-color: #1388d6;
             margin: 20px 0
         }
 
@@ -52,7 +52,7 @@
         code,
         h3::before,
         p a {
-            color: #4658c6
+            color: #1388d6
         }
 
         h3::before {
@@ -741,6 +741,7 @@
                 Headers
                 <ul>
                     <li><code>Content-Type</code> : <code>multipart/form-data</code></li>
+                    <li><code>Authorization</code> : <code> Bearer &lt;token&gt;</code></li>
                 </ul>
             </li>
             <li>
@@ -827,6 +828,58 @@
             </li>
         </ul>
 
+        <!-- Display All User Jobs -->
+        <h3 id="all-jobs"><a href="#all-jobs">Display All User Jobs</a></h3>
+        <ul>
+            <li>
+                URL
+                <ul>
+                    <li>
+                        <code>/api/jobs/allUserJobs</code>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                Method
+                <ul>
+                    <li>GET</li>
+                </ul>
+            </li>
+            <li>
+                Headers
+                <ul>
+                    <li><code>Authorization</code> : <code> Bearer &lt;token&gt;</code></li>
+                </ul>
+            </li>
+            <li>
+                Response
+                <pre v-pre data-lang="json">
+                <code class="response">
+        {
+            "message": "All Jobs Listing",
+            "status": 200,
+            "total": 100,
+            "data": [
+                {
+                    "createdAt": "6/7/2023|3:13:17 PM",
+                    "companyProfileImage": "URL",
+                    "companyName": "Samsung Service Center",
+                    "jobDescription": "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+                    "location": "Jakarta, Indonesia",
+                    "requiredSkills": "AC Repair",
+                    "id": "4mWPCWQmDkU4nczUFgrc",
+                    "jobType": "Full-Time",
+                    "title": "AC Service",
+                    "email": "servicecenter@samsung.id"
+                },
+                    ...
+            ]
+        }
+                </code>
+                </pre>
+            </li>
+        </ul>
+
         <!-- Display Job Detail -->
         <h3 id="job"><a href="#job">Display Job Detail</a></h3>
         <ul>
@@ -849,6 +902,12 @@
                 <ul>
                     <li><code>key</code> : <code>id</code></li>
                     <li><code>value</code> : <code>job id</code></li>
+                </ul>
+            </li>
+            <li>
+                Headers
+                <ul>
+                    <li><code>Authorization</code> : <code> Bearer &lt;token&gt;</code></li>
                 </ul>
             </li>
             <li>
@@ -904,6 +963,7 @@
                 Headers
                 <ul>
                     <li><code>Content-Type</code> : <code>multipart/form-data</code></li>
+                    <li><code>Authorization</code> : <code> Bearer &lt;token&gt;</code></li>
                 </ul>
             </li>
             <li>
@@ -967,6 +1027,12 @@
                 <ul>
                     <li><code>key</code> : <code>id</code></li>
                     <li><code>value</code> : <code>job id</code></li>
+                </ul>
+            </li>
+            <li>
+                Headers
+                <ul>
+                    <li><code>Authorization</code> : <code> Bearer &lt;token&gt;</code></li>
                 </ul>
             </li>
             <li>
