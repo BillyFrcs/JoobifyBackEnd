@@ -159,7 +159,6 @@ const getJobDetail = async (req, res) => {
     }
 };
 
-// Update job profile by id (Only for Testing)
 const updateJob = async (req, res) => {
     try {
         const user = firebaseApp.auth().currentUser;
