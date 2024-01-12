@@ -108,7 +108,8 @@ const signIn = async (req, res) => {
                 }))
             .then(() => {
                 firebaseApp.auth().currentUser.getIdToken().then((idToken) => {
-                    // console.log(idToken); // It shows the Firebase access token now
+                    // It'll shows the Firebase access token for the current user
+                    // console.log(idToken);
                 });
             })
             .catch((error) => {
