@@ -215,6 +215,9 @@ const postJob = async (req, res) => {
                 // Add with another random id to the firestore collection
                 // await JobsCollection.doc(jobID).collection(JobsCollection.doc().id).add(jobData, { merge: true });
 
+                // Send to the firestore collection
+                await JobsCollection.doc(jobID).set(jobData, { merge: true });
+
                 res.status(201).send({
                     message: 'Successfully Posted Job',
                     status: 201,
@@ -236,10 +239,51 @@ const postJob = async (req, res) => {
     }
 };
 
+const displayAllUsersJobs = async (req, res) => {
+    try {
+        const user = firebaseApp.auth().currentUser;
+
+        const snapshot = await JobsCollection.count().get();
+
+        if (user && req.user.uid) {
+            await JobsCollection.get().then((value) => {
+                const jobs = value.docs.map((document) => document.data());
+    
+                // Check if the jobs is empty
+                if (jobs.length !== 0) {
+                    res.status(200).send({
+                        message: 'All Users Jobs',
+                        status: 200,
+                        total: snapshot.data().count,
+                        data: jobs
+                    });
+                } else {
+                    res.status(404).send({
+                        message: 'No Jobs Found',
+                        status: 404
+                    });
+                }
+            });
+        } else {
+            res.status(403).send({
+                message: 'User is Not Sign In',
+                status: 403
+            });
+        }
+    } catch (error) {
+        res.status(400).send({
+            message: 'Something Went Wrong to Display All Users Jobs',
+            status: 400,
+            error: error.message
+        });
+    }
+};
+
 const displayUserJobs = async (req, res) => {
     try {
         const user = firebaseApp.auth().currentUser;
         const userID = user.uid || req.user.uid;
+        
         const snapshot = await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).count().get();
 
         if (user && req.user.uid) {
@@ -533,4 +577,4 @@ const deleteJob = async (req, res) => {
     }
 };
 
-module.exports = { addJob, postJob, displayUserJobs, displayJobDetail, getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob };
+module.exports = { addJob, postJob, displayAllUsersJobs, displayUserJobs, displayJobDetail, getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob };
