@@ -10,6 +10,7 @@ const JobModel = require('../models/jobModel');
 require('dotenv').config();
 
 const JobsCollection = firebaseAdmin.firestore().collection(process.env.JOBS_COLLECTION);
+const UsersCollection = firebaseAdmin.firestore().collection(process.env.USERS_COLLECTION);
 
 const CloudStorage = new Storage({
     projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
@@ -117,6 +118,207 @@ const addJob = async (req, res) => {
     } catch (error) {
         res.status(400).send({
             message: 'Something Went Wrong to Added Job',
+            status: 400,
+            error: error.message
+        });
+    }
+};
+
+const postJob = async (req, res) => {
+    try {
+        const user = firebaseApp.auth().currentUser;
+
+        if (user && req.user.uid) {
+            const form = new formidable.IncomingForm({ multiples: true });
+
+            // Default implementation
+            form.parse(req, async (error, fields, files) => {
+                // Create validation of the fields and files
+                if (!fields.title || !fields.companyName || !fields.location || !fields.email || !fields.jobType || !fields.requiredSkills || !fields.jobDescription || !files.companyProfileImage) {
+                    return res.status(400).json({
+                        message: 'Please Fill All Required Input Fields',
+                        status: 400
+                    });
+                }
+
+                const id = uuidv4();
+
+                const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME;
+
+                const storagePublicURL = `https://storage.googleapis.com/${bucketName}.appspot.com/`;
+
+                // const storagePublicURL = `https://firebasestorage.googleapis.com/v0/b/${bucketName}.appspot.com/o/`;
+
+                // The variable should be match with the name of the key field
+                const companyProfileImage = files.companyProfileImage;
+
+                // URL of the uploaded image
+                let imageURL;
+
+                const userID = user.uid || req.user.uid;
+
+                const jobID = JobsCollection.doc().id;
+
+                if (error) {
+                    return res.status(400).json({
+                        message: 'There Was an Error Parsing The Files',
+                        status: 400,
+                        error: error.message
+                    });
+                }
+
+                const bucket = CloudStorage.bucket(`gs://${bucketName}.appspot.com`);
+
+                if (companyProfileImage.size === 0) {
+                    res.status(404).send({
+                        message: 'Image is Not Found',
+                        status: 404
+                    });
+                } else {
+                    const imageResponse = await bucket.upload(companyProfileImage.path, {
+                        destination: `${process.env.JOBS_COLLECTION}/${userID}/${jobID}/${companyProfileImage.name}`,
+                        resumable: true,
+                        metadata: {
+                            metadata: {
+                                firebaseStorageDownloadTokens: id
+                            }
+                        }
+                    });
+
+                    // Profile image url
+                    // imageURL = `${storagePublicURL + encodeURIComponent(imageResponse[0].name)}?alt=media&token=${id}`;
+
+                    imageURL = storagePublicURL + imageResponse[0].name;
+                }
+
+                const date = new Date();
+
+                const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
+
+                // Object to send to the database
+                const jobData = {
+                    id: jobID,
+                    title: fields.title,
+                    companyName: fields.companyName,
+                    location: fields.location,
+                    email: fields.email,
+                    jobType: fields.jobType,
+                    requiredSkills: fields.requiredSkills,
+                    jobDescription: fields.jobDescription,
+                    companyProfileImage: companyProfileImage.size === 0 ? '' : imageURL,
+                    createdAt: getDateAndTime
+                };
+
+                // Added to the firestore collection
+                await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).doc(jobID).set(jobData, { merge: true });
+
+                // Add with another random id to the firestore collection
+                // await JobsCollection.doc(jobID).collection(JobsCollection.doc().id).add(jobData, { merge: true });
+
+                res.status(201).send({
+                    message: 'Successfully Posted Job',
+                    status: 201,
+                    data: jobData
+                });
+            });
+        } else {
+            res.status(403).send({
+                message: 'User is Not Sign In',
+                status: 403
+            });
+        }
+    } catch (error) {
+        res.status(400).send({
+            message: 'Something Went Wrong to Posted Job',
+            status: 400,
+            error: error.message
+        });
+    }
+};
+
+const displayUserJobs = async (req, res) => {
+    try {
+        const user = firebaseApp.auth().currentUser;
+        const userID = user.uid || req.user.uid;
+        const snapshot = await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).count().get();
+
+        if (user && req.user.uid) {
+            await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).get().then((value) => {
+                const jobs = value.docs.map((document) => document.data());
+
+                // Check if the jobs is empty
+                if (jobs.length !== 0) {
+                    res.status(200).send({
+                        message: 'All User Jobs ',
+                        status: 200,
+                        total: snapshot.data().count,
+                        data: jobs
+                    });
+                } else {
+                    res.status(404).send({
+                        message: 'No Jobs Found',
+                        status: 404
+                    });
+                }
+            });
+        } else {
+            res.status(403).send({
+                message: 'User is Not Sign In',
+                status: 403
+            });
+        }
+    } catch (error) {
+        res.status(400).send({
+            message: 'Something Went Wrong to Display User Jobs',
+            status: 400,
+            error: error.message
+        });
+    }
+};
+
+const displayJobDetail = async (req, res) => {
+    try {
+        const user = firebaseApp.auth().currentUser;
+        const userID = user.uid || req.user.uid;
+
+        if (user && req.user.uid) {
+            const jobID = req.params.id;
+            const job = await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).doc(jobID).get();
+
+            // const job = await UsersCollection.doc(jobID).get();
+
+            if (!job.exists) {
+                res.status(404).send({
+                    message: 'Cannot Found Job Detail',
+                    status: 404
+                });
+            } else {
+                res.status(200).send({
+                    message: 'Job Detail',
+                    status: 200,
+                    data: job.data()
+                });
+            }
+
+            /* Using list
+            await collection.where('id', '==', req.params.id).get().then((value) => {
+                const job = value.docs.map((document) => document.data());
+        
+                res.status(200).send({
+                    message: 'Display Job Detail',
+                    data: job
+                });
+            });
+            */
+        } else {
+            res.status(403).send({
+                message: 'User is Not Sign In',
+                status: 403
+            });
+        }
+    } catch (error) {
+        res.status(400).send({
+            message: 'Something Went Wrong to Display Job Detail',
             status: 400,
             error: error.message
         });
@@ -331,4 +533,4 @@ const deleteJob = async (req, res) => {
     }
 };
 
-module.exports = { addJob, getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob };
+module.exports = { addJob, postJob, displayUserJobs, displayJobDetail, getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob };
