@@ -248,7 +248,7 @@ const displayAllUsersJobs = async (req, res) => {
         if (user && req.user.uid) {
             await JobsCollection.get().then((value) => {
                 const jobs = value.docs.map((document) => document.data());
-    
+
                 // Check if the jobs is empty
                 if (jobs.length !== 0) {
                     res.status(200).send({
@@ -283,7 +283,7 @@ const displayUserJobs = async (req, res) => {
     try {
         const user = firebaseApp.auth().currentUser;
         const userID = user.uid || req.user.uid;
-        
+
         const snapshot = await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).count().get();
 
         if (user && req.user.uid) {
@@ -363,6 +363,135 @@ const displayJobDetail = async (req, res) => {
     } catch (error) {
         res.status(400).send({
             message: 'Something Went Wrong to Display Job Detail',
+            status: 400,
+            error: error.message
+        });
+    }
+};
+
+const updateUserJob = async (req, res) => {
+    try {
+        const user = firebaseApp.auth().currentUser;
+
+        if (user && req.user.uid) {
+            const userID = user.uid || req.user.uid;
+
+            const jobID = req.params.id;
+            const job = await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).doc(jobID).get();
+
+            // const job = await JobsCollection.doc(jobID).get();
+
+            const form = new formidable.IncomingForm({ multiples: true });
+
+            if (!job.exists) {
+                res.status(404).send({
+                    message: 'Job is Not Found',
+                    status: 404
+                });
+            } else {
+                // Default implementation
+                form.parse(req, async (error, fields, files) => {
+                    // Create validation of the fields and files
+                    if (!fields.title || !fields.companyName || !fields.location || !fields.email || !fields.jobType || !fields.requiredSkills || !fields.jobDescription || !files.companyProfileImage) {
+                        return res.status(400).json({
+                            message: 'Please fill all the required input fields',
+                            status: 400
+                        });
+                    }
+
+                    const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME;
+
+                    const storagePublicURL = `https://storage.googleapis.com/${bucketName}.appspot.com/`;
+
+                    // const storagePublicURL = `https://firebasestorage.googleapis.com/v0/b/${bucketName}.appspot.com/o/`;
+
+                    const companyProfileImage = files.companyProfileImage;
+
+                    // URL of the uploaded image
+                    let imageURL;
+
+                    if (error) {
+                        return res.status(400).json({
+                            message: 'There was an error parsing the files',
+                            status: 400,
+                            error: error.message
+                        });
+                    }
+
+                    const bucket = CloudStorage.bucket(`gs://${bucketName}.appspot.com`);
+
+                    if (companyProfileImage.size === 0) {
+                        res.status(404).send({
+                            message: 'No Image Found',
+                            status: 404
+                        });
+                    } else {
+                        const imageResponse = await bucket.upload(companyProfileImage.path, {
+                            destination: `${process.env.JOBS_COLLECTION}/${userID}/${jobID}/${companyProfileImage.name}`,
+                            resumable: true,
+                            metadata: {
+                                metadata: {
+                                    firebaseStorageDownloadTokens: jobID
+                                }
+                            }
+                        });
+
+                        // Profile image url
+                        // imageURL = `${storagePublicURL + encodeURIComponent(imageResponse[0].name)}?alt=media&token=${uuid}`;
+
+                        imageURL = storagePublicURL + imageResponse[0].name;
+                    }
+
+                    const date = new Date();
+
+                    const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
+
+                    // Object to send to the database
+                    const jobData = {
+                        id: jobID,
+                        title: fields.title,
+                        companyName: fields.companyName,
+                        location: fields.location,
+                        email: fields.email,
+                        jobType: fields.jobType,
+                        requiredSkills: fields.requiredSkills,
+                        jobDescription: fields.jobDescription,
+                        companyProfileImage: companyProfileImage.size === 0 ? '' : imageURL,
+                        updatedAt: getDateAndTime
+                    };
+
+                    // Update to the firestore collection
+                    await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).doc(jobID).update(jobData, { merge: true });
+
+                    // Update to the firestore collection
+                    await JobsCollection.doc(jobID).set(jobData, { merge: true });
+
+                    res.status(202).send({
+                        message: 'Update Job Successfully',
+                        status: 202,
+                        data: jobData
+                    });
+
+                    /*
+                    await JobsCollection.doc(jobID).update(jobData, { merge: true }).then(() => {
+                        res.status(202).send({
+                            message: 'Update Job Successfully',
+                            status: 202,
+                            data: jobData
+                        });
+                    });
+                    */
+                });
+            }
+        } else {
+            res.status(403).send({
+                message: 'User is Not Sign In',
+                status: 403
+            });
+        }
+    } catch (error) {
+        res.status(400).send({
+            message: 'Something went wrong to Update Job',
             status: 400,
             error: error.message
         });
@@ -577,4 +706,7 @@ const deleteJob = async (req, res) => {
     }
 };
 
-module.exports = { addJob, postJob, displayAllUsersJobs, displayUserJobs, displayJobDetail, getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob };
+module.exports = {
+    addJob, postJob, displayAllUsersJobs, displayUserJobs, displayJobDetail, updateUserJob,
+    getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob
+};
