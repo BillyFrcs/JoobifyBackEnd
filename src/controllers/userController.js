@@ -1,4 +1,6 @@
 const { Storage } = require('@google-cloud/storage');
+const { v4: uuidv4 } = require('uuid');
+
 const formidable = require('formidable-serverless');
 
 const firebaseApp = require('../config/firebaseApp');
@@ -64,14 +66,14 @@ const updateUserAccountProfile = async (req, res) => {
                 // Default implementation
                 form.parse(req, async (error, fields, files) => {
                     // Create validation of the fields and files
-                    if (!fields.name || !fields.headline || !fields.location || !fields.skills || !fields.status || !files.userProfileImage || !fields.about) {
+                    if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !fields.skills || !files.userProfileImage || !fields.about) {
                         return res.status(422).json({
                             message: 'Please Fill Out All Fields',
                             status: 422
                         });
                     }
 
-                    const userID = user.uid;
+                    const userID = user.uid || req.user.uid;
 
                     const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME;
 
@@ -95,6 +97,8 @@ const updateUserAccountProfile = async (req, res) => {
 
                     const bucket = CloudStorage.bucket(`gs://${bucketName}.appspot.com`);
 
+                    const id = uuidv4();
+
                     if (userProfileImage.size === 0) {
                         res.status(404).send({
                             message: 'No Image Found',
@@ -106,13 +110,13 @@ const updateUserAccountProfile = async (req, res) => {
                             resumable: true,
                             metadata: {
                                 metadata: {
-                                    firebaseStorageDownloadTokens: userID
+                                    firebaseStorageDownloadTokens: id
                                 }
                             }
                         });
 
                         // Profile image url
-                        // imageURL = `${storagePublicURL + encodeURIComponent(imageResponse[0].name)}?alt=media&token=${userID}`;
+                        // imageURL = `${storagePublicURL + encodeURIComponent(imageResponse[0].name)}?alt=media&token=${id}`;
 
                         imageURL = storagePublicURL + imageResponse[0].name;
                     }
@@ -124,10 +128,10 @@ const updateUserAccountProfile = async (req, res) => {
                     // Object to send to the database
                     const userData = {
                         name: fields.name,
+                        phoneNumber: fields.phoneNumber,
                         headline: fields.headline,
                         location: fields.location,
                         skills: fields.skills,
-                        status: fields.status,
                         userProfileImage: userProfileImage.size === 0 ? '' : imageURL,
                         about: fields.about,
                         updatedAt: getDateAndTime
@@ -138,6 +142,7 @@ const updateUserAccountProfile = async (req, res) => {
                         .then(() => {
                             user.updateProfile({
                                 displayName: userData.name,
+                                phoneNumber: userData.phoneNumber,
                                 photoURL: userData.userProfileImage
                             });
                         })
@@ -183,7 +188,7 @@ const updateUserAccountProfileByID = async (req, res) => {
             // Default implementation
             form.parse(req, async (error, fields, files) => {
                 // Create validation of the fields and files
-                if (!fields.name || !fields.headline || !fields.location || !fields.skills || !fields.status || !files.userProfileImage || !fields.about) {
+                if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !fields.skills || !files.userProfileImage || !fields.about) {
                     return res.status(422).json({
                         message: 'Please Fill Out All Fields',
                         status: 422
@@ -212,6 +217,8 @@ const updateUserAccountProfileByID = async (req, res) => {
 
                 const bucket = CloudStorage.bucket(`gs://${bucketName}.appspot.com`);
 
+                const id = uuidv4();
+
                 if (userProfileImage.size === 0) {
                     res.status(404).send({
                         message: 'No Image Found',
@@ -223,13 +230,13 @@ const updateUserAccountProfileByID = async (req, res) => {
                         resumable: true,
                         metadata: {
                             metadata: {
-                                firebaseStorageDownloadTokens: userID
+                                firebaseStorageDownloadTokens: id
                             }
                         }
                     });
 
                     // Profile image url
-                    // imageURL = `${storagePublicURL + encodeURIComponent(imageResponse[0].name)}?alt=media&token=${userID}`;
+                    // imageURL = `${storagePublicURL + encodeURIComponent(imageResponse[0].name)}?alt=media&token=${id}`;
 
                     imageURL = storagePublicURL + imageResponse[0].name;
                 }
@@ -241,10 +248,10 @@ const updateUserAccountProfileByID = async (req, res) => {
                 // Object to send to the database
                 const userData = {
                     name: fields.name,
+                    phoneNumber: fields.phoneNumber,
                     headline: fields.headline,
                     location: fields.location,
                     skills: fields.skills,
-                    status: fields.status,
                     userProfileImage: userProfileImage.size === 0 ? '' : imageURL,
                     about: fields.about,
                     updatedAt: getDateAndTime
@@ -255,6 +262,7 @@ const updateUserAccountProfileByID = async (req, res) => {
                     .then(() => {
                         user.updateProfile({
                             displayName: userData.name,
+                            phoneNumber: userData.phoneNumber,
                             photoURL: userData.userProfileImage
                         });
                     })
@@ -287,14 +295,14 @@ const editUserProfile = async (req, res) => {
                 // Default implementation
                 form.parse(req, async (error, fields, files) => {
                     // Create validation of the fields and files
-                    if (!fields.name || !files.userProfileImage) {
+                    if (!fields.name || !fields.phoneNumber || !files.userProfileImage) {
                         return res.status(400).send({
                             message: 'Please Fill All The Required Fields',
                             status: 400
                         });
                     }
 
-                    const userID = user.uid;
+                    const userID = user.uid || req.user.uid;
 
                     const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME;
 
@@ -318,6 +326,8 @@ const editUserProfile = async (req, res) => {
 
                     const bucket = CloudStorage.bucket(`gs://${bucketName}.appspot.com`);
 
+                    const id = uuidv4();
+
                     if (userProfileImage.size === 0) {
                         res.status(404).send({
                             message: 'No Image Found',
@@ -329,13 +339,13 @@ const editUserProfile = async (req, res) => {
                             resumable: true,
                             metadata: {
                                 metadata: {
-                                    firebaseStorageDownloadTokens: userID
+                                    firebaseStorageDownloadTokens: id
                                 }
                             }
                         });
 
                         // Profile image url
-                        // imageURL = `${storagePublicURL + encodeURIComponent(imageResponse[0].name)}?alt=media&token=${userID}`;
+                        // imageURL = `${storagePublicURL + encodeURIComponent(imageResponse[0].name)}?alt=media&token=${id}`;
 
                         imageURL = storagePublicURL + imageResponse[0].name;
                     }
@@ -347,6 +357,7 @@ const editUserProfile = async (req, res) => {
                     // Object to send to the database
                     const userData = {
                         name: fields.name,
+                        phoneNumber: fields.phoneNumber,
                         userProfileImage: userProfileImage.size === 0 ? '' : imageURL,
                         updatedAt: getDateAndTime
                     };
@@ -356,6 +367,7 @@ const editUserProfile = async (req, res) => {
                         .then(() => {
                             user.updateProfile({
                                 displayName: userData.name,
+                                phoneNumber: userData.phoneNumber,
                                 photoURL: userData.userProfileImage
                             });
                         })
@@ -394,14 +406,14 @@ const editUserInformation = async (req, res) => {
                 // Default implementation
                 form.parse(req, async (error, fields) => {
                     // Create validation of the fields
-                    if (!fields.headline || !fields.location || !fields.skills || !fields.status || !fields.about) {
+                    if (!fields.headline || !fields.location || !fields.skills || !fields.about) {
                         return res.status(400).send({
                             message: 'All Fields are Required',
                             status: 400
                         });
                     }
 
-                    const userID = user.uid;
+                    const userID = user.uid || req.user.uid;
 
                     if (error) {
                         return res.status(400).json({
@@ -420,19 +432,12 @@ const editUserInformation = async (req, res) => {
                         headline: fields.headline,
                         skills: fields.skills,
                         location: fields.location,
-                        status: fields.status,
                         about: fields.about,
                         updatedAt: getDateAndTime
                     };
 
                     // Added to the firestore collection
                     await UsersCollection.doc(userID).update(userData, { merge: true })
-                        .then(() => {
-                            user.updateProfile({
-                                displayName: userData.name,
-                                photoURL: userData.userProfileImage
-                            });
-                        })
                         .then(() => {
                             res.status(202).send({
                                 message: 'Successfully Edit User Information',
