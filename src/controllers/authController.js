@@ -36,7 +36,7 @@ const signUp = async (req, res) => {
                     userProfileImage: defaultUserProfile,
                     about: req.body.about || "Empty",
                     createdAt: getDateAndTime,
-                    updatedAt: "Hasn't Been Updated Yet"
+                    updatedAt: "Hasn't been Updated yet"
                 });
             })
             .then(() => {
