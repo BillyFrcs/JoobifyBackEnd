@@ -498,6 +498,71 @@ const updateUserJob = async (req, res) => {
     }
 };
 
+const deleteJobImageStorage = async (userID, jobID) => {
+    try {
+        const bucket = CloudStorage.bucket(`${process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME}.appspot.com`);
+
+        // Delete the folder itself
+        bucket.deleteFiles({
+            prefix: `${process.env.JOBS_COLLECTION}/${userID}/${jobID}`
+        });
+
+        /*
+        // Delete files in the folder
+        bucket.deleteFiles({
+          prefix: filePath
+        });
+        */
+
+        // console.log('Folder deleted successfully.');
+    } catch (error) {
+        throw new Error('Error Deleting Folder: ', error);
+    }
+};
+
+const deleteUserJob = async (req, res) => {
+    try {
+        const user = firebaseApp.auth().currentUser;
+        const userID = user.uid || req.user.uid;
+
+        if (user || req.user.uid) {
+            const jobID = req.params.id;
+            const job = await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).doc(jobID).get();
+
+            if (!job.exists) {
+                res.status(404).send({
+                    message: 'Job is Not Found',
+                    status: 404
+                });
+            } else {
+                // Delete the job data from user sub collection
+                await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).doc(jobID).delete();
+
+                // Delete the job data from the root collection
+                await JobsCollection.doc(req.params.id).delete();
+
+                deleteJobImageStorage(userID, jobID);
+
+                res.status(202).send({
+                    message: 'Delete Job Successfully',
+                    status: 202
+                });
+            }
+        } else {
+            res.status(403).send({
+                message: 'User is Not Sign In',
+                status: 403
+            });
+        }
+    } catch (error) {
+        res.status(400).send({
+            message: 'Something Went Wrong to Delete Job',
+            status: 400,
+            error: error.message
+        });
+    }
+};
+
 const getAllJobs = async (req, res) => {
     try {
         JobModel.getAllJobs(req, res, JobsCollection);
@@ -708,5 +773,5 @@ const deleteJob = async (req, res) => {
 
 module.exports = {
     addJob, postJob, displayAllUsersJobs, displayUserJobs, displayJobDetail, updateUserJob,
-    getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob
+    deleteUserJob, getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob
 };

@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { addJob, postJob, displayAllUsersJobs, displayUserJobs, displayJobDetail, updateUserJob,
+const { addJob, postJob, displayAllUsersJobs, displayUserJobs, displayJobDetail, updateUserJob, deleteUserJob,
     getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob } = require('../controllers/jobController');
 
 const Middleware = require('../middleware/auth');
@@ -20,6 +20,7 @@ router.get('/job/:id', Middleware.authenticate, getJobDetail);
 router.put('/updateUserJob/:id', Middleware.authenticate, updateUserJob);
 router.put('/updateJob/:id', Middleware.authenticate, updateJob);
 
+router.delete('/deleteUserJob/:id', Middleware.authenticate, deleteUserJob);
 router.delete('/deleteJob/:id', Middleware.authenticate, deleteJob);
 
 module.exports = { routes: router };
