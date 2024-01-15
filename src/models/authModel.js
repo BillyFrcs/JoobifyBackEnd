@@ -93,7 +93,7 @@ const deleteAccount = async (req, res, firebase, collection) => {
     }
 };
 
-// Delete user account from authentication and firestore by id (Only For Testing)
+// Delete user account from authentication and firestore by id
 const deleteAccountByID = async (req, res, firebase, collection) => {
     const userID = req.params.id;
     const user = await collection.doc(userID);

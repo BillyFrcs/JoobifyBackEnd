@@ -1,3 +1,5 @@
+const firebaseApp = require('../config/firebaseApp');
+
 const getAllUsersAccountProfile = async (req, res, collection) => {
     const response = [];
 
@@ -71,22 +73,29 @@ const getUserAccountProfile = async (req, res, firebase, collection) => {
     }
 };
 
-// Get the user's account profile by id (Only for Testing)
+// Get the user's account profile by id
 const getUserAccountProfileByID = async (req, res, collection) => {
     const userID = req.params.id;
-    const user = await collection.doc(userID);
-    const profile = await user.get();
+    const user = firebaseApp.auth().currentUser;
+    const profile = await collection.doc(userID).get();
 
-    if (!profile.exists) {
-        res.status(404).send({
-            message: 'User is Not Found',
-            status: 404
-        });
+    if (user || req.user.uid) {
+        if (!profile.exists) {
+            res.status(404).send({
+                message: 'User is Not Found',
+                status: 404
+            });
+        } else {
+            res.status(200).send({
+                message: 'Display User Profile',
+                status: 200,
+                data: profile.data()
+            });
+        }
     } else {
-        res.status(200).send({
-            message: 'Display User Profile',
-            status: 200,
-            data: profile.data()
+        res.status(403).send({
+            message: 'User is Not Sign In',
+            status: 403
         });
     }
 };

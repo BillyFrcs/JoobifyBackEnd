@@ -732,7 +732,7 @@ const deleteJobProfileStorage = async (uid) => {
     }
 };
 
-// Delete job profile by id (Only for Testing)
+// Delete job profile by id
 const deleteJob = async (req, res) => {
     try {
         const user = firebaseApp.auth().currentUser;

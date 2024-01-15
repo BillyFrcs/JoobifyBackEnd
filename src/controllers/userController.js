@@ -41,7 +41,7 @@ const getUserAccountProfile = async (req, res) => {
     }
 };
 
-// Get the user's account profile by id (Only For Testing)
+// Get the user's account profile by id
 const getUserAccountProfileByID = async (req, res) => {
     try {
         UserModel.getUserAccountProfileByID(req, res, UsersCollection);
@@ -58,11 +58,12 @@ const getUserAccountProfileByID = async (req, res) => {
 const updateUserAccountProfile = async (req, res) => {
     try {
         const user = firebaseApp.auth().currentUser;
+        const userID = user.uid || req.user.uid;
 
         const form = new formidable.IncomingForm({ multiples: true });
 
         if (user && req.user.uid) {
-            await UsersCollection.doc(user.uid).get().then(() => {
+            await UsersCollection.doc(userID).get().then(() => {
                 // Default implementation
                 form.parse(req, async (error, fields, files) => {
                     // Create validation of the fields and files
@@ -72,8 +73,6 @@ const updateUserAccountProfile = async (req, res) => {
                             status: 422
                         });
                     }
-
-                    const userID = user.uid || req.user.uid;
 
                     const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME;
 
@@ -170,109 +169,119 @@ const updateUserAccountProfile = async (req, res) => {
     }
 };
 
-// Update the user's account profile by id (Only For Testing)
+// Update the user's account profile by id
 const updateUserAccountProfileByID = async (req, res) => {
     try {
         const userID = req.params.id;
-        const user = await UsersCollection.doc(userID);
-        const profile = await user.get();
+        const user = firebaseApp.auth().currentUser;
+
+        const profile = await UsersCollection.doc(userID).get();
 
         const form = new formidable.IncomingForm({ multiples: true });
 
-        if (!profile.exists) {
-            res.status(404).send({
-                message: 'User is Not Found',
-                status: 404
-            });
-        } else {
-            // Default implementation
-            form.parse(req, async (error, fields, files) => {
-                // Create validation of the fields and files
-                if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !fields.skills || !files.userProfileImage || !fields.about) {
-                    return res.status(422).json({
-                        message: 'Please Fill Out All Fields',
-                        status: 422
-                    });
-                }
-
-                const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME;
-
-                const storagePublicURL = `https://storage.googleapis.com/${bucketName}.appspot.com/`;
-
-                // const storagePublicURL = `https://firebasestorage.googleapis.com/v0/b/${bucketName}.appspot.com/o/`;
-
-                // The variable should be match with the name of the key field
-                const { userProfileImage } = files;
-
-                // URL of the uploaded image
-                let imageURL;
-
-                if (error) {
-                    return res.status(400).json({
-                        message: 'There Was an Error Parsing The Files',
-                        status: 400,
-                        error: error.message
-                    });
-                }
-
-                const bucket = CloudStorage.bucket(`gs://${bucketName}.appspot.com`);
-
-                const id = uuidv4();
-
-                if (userProfileImage.size === 0) {
-                    res.status(404).send({
-                        message: 'No Image Found',
-                        status: 404
-                    });
-                } else {
-                    const imageResponse = await bucket.upload(userProfileImage.path, {
-                        destination: `${process.env.USERS_COLLECTION}/${userID}/${userProfileImage.name}`,
-                        resumable: true,
-                        metadata: {
-                            metadata: {
-                                firebaseStorageDownloadTokens: id
-                            }
+        if (user && req.user.uid) {
+            if (!profile.exists) {
+                res.status(404).send({
+                    message: 'User is Not Found',
+                    status: 404
+                });
+            } else {
+                await UsersCollection.doc(userID).get().then(() => {
+                    // Default implementation
+                    form.parse(req, async (error, fields, files) => {
+                        // Create validation of the fields and files
+                        if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !fields.skills || !files.userProfileImage || !fields.about) {
+                            return res.status(422).json({
+                                message: 'Please Fill Out All Fields',
+                                status: 422
+                            });
                         }
+
+                        const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME;
+
+                        const storagePublicURL = `https://storage.googleapis.com/${bucketName}.appspot.com/`;
+
+                        // const storagePublicURL = `https://firebasestorage.googleapis.com/v0/b/${bucketName}.appspot.com/o/`;
+
+                        // The variable should be match with the name of the key field
+                        const { userProfileImage } = files;
+
+                        // URL of the uploaded image
+                        let imageURL;
+
+                        if (error) {
+                            return res.status(400).json({
+                                message: 'There Was an Error Parsing The Files',
+                                status: 400,
+                                error: error.message
+                            });
+                        }
+
+                        const bucket = CloudStorage.bucket(`gs://${bucketName}.appspot.com`);
+
+                        const id = uuidv4();
+
+                        if (userProfileImage.size === 0) {
+                            res.status(404).send({
+                                message: 'No Image Found',
+                                status: 404
+                            });
+                        } else {
+                            const imageResponse = await bucket.upload(userProfileImage.path, {
+                                destination: `${process.env.USERS_COLLECTION}/${userID}/${userProfileImage.name}`,
+                                resumable: true,
+                                metadata: {
+                                    metadata: {
+                                        firebaseStorageDownloadTokens: id
+                                    }
+                                }
+                            });
+
+                            // Profile image url
+                            // imageURL = `${storagePublicURL + encodeURIComponent(imageResponse[0].name)}?alt=media&token=${id}`;
+
+                            imageURL = storagePublicURL + imageResponse[0].name;
+                        }
+
+                        const date = new Date();
+
+                        const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
+
+                        // Object to send to the database
+                        const userData = {
+                            name: fields.name,
+                            phoneNumber: fields.phoneNumber,
+                            headline: fields.headline,
+                            location: fields.location,
+                            skills: fields.skills,
+                            userProfileImage: userProfileImage.size === 0 ? '' : imageURL,
+                            about: fields.about,
+                            updatedAt: getDateAndTime
+                        };
+
+                        // Added to the firestore collection
+                        await UsersCollection.doc(userID).update(userData, { merge: true })
+                            .then(() => {
+                                user.updateProfile({
+                                    displayName: userData.name,
+                                    phoneNumber: userData.phoneNumber,
+                                    photoURL: userData.userProfileImage
+                                });
+                            })
+                            .then(() => {
+                                res.status(202).send({
+                                    message: 'Successfully Update User Profile',
+                                    status: 202,
+                                    data: userData
+                                });
+                            });
                     });
-
-                    // Profile image url
-                    // imageURL = `${storagePublicURL + encodeURIComponent(imageResponse[0].name)}?alt=media&token=${id}`;
-
-                    imageURL = storagePublicURL + imageResponse[0].name;
-                }
-
-                const date = new Date();
-
-                const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
-
-                // Object to send to the database
-                const userData = {
-                    name: fields.name,
-                    phoneNumber: fields.phoneNumber,
-                    headline: fields.headline,
-                    location: fields.location,
-                    skills: fields.skills,
-                    userProfileImage: userProfileImage.size === 0 ? '' : imageURL,
-                    about: fields.about,
-                    updatedAt: getDateAndTime
-                };
-
-                // Added to the firestore collection
-                await UsersCollection.doc(userID).update(userData, { merge: true })
-                    .then(() => {
-                        user.updateProfile({
-                            displayName: userData.name,
-                            phoneNumber: userData.phoneNumber,
-                            photoURL: userData.userProfileImage
-                        });
-                    })
-                    .then(() => {
-                        res.status(202).send({
-                            message: 'Successfully Update User Profile',
-                            status: 202,
-                            data: userData
-                        });
-                    });
+                });
+            }
+        } else {
+            res.status(403).send({
+                message: 'User is Not Sign In',
+                status: 403
             });
         }
     } catch (error) {
