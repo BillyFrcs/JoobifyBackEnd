@@ -1,6 +1,7 @@
 const { Storage } = require('@google-cloud/storage');
 
 const firebaseAdmin = require('../config/firebaseAdmin');
+const firebaseApp = require('../config/firebaseApp');
 
 require('dotenv').config();
 
@@ -96,27 +97,36 @@ const deleteAccount = async (req, res, firebase, collection) => {
 // Delete user account from authentication and firestore by id
 const deleteAccountByID = async (req, res, firebase, collection) => {
     const userID = req.params.id;
-    const user = await collection.doc(userID);
-    const profile = await user.get();
+    const user = firebaseApp.auth().currentUser;
 
-    if (!profile.exists) {
-        res.status(404).send({
-            message: 'Account is Not Found',
-            status: 404
-        });
+    const profile = await collection.doc(userID).get();
+
+    // Check if the userID is empty or not
+    if (user || req.user.uid) {
+        if (!profile.exists) {
+            res.status(404).send({
+                message: 'Account is Not Found',
+                status: 404
+            });
+        } else {
+            // Delete the user's account profile from authentication
+            await firebase.auth().currentUser.delete();
+
+            // Delete the user's account profile from firestore
+            await collection.doc(userID).delete();
+
+            // Delete the user's account profile from storage
+            await deleteProfileStorage(userID);
+
+            res.status(200).send({
+                message: 'Successfully Deleted Account',
+                status: 200
+            });
+        }
     } else {
-        // Delete the user's account profile from authentication
-        await firebase.auth().currentUser.delete();
-
-        // Delete the user's account profile from firestore
-        await collection.doc(userID).delete();
-
-        // Delete the user's account profile from storage
-        await deleteProfileStorage(userID);
-
-        res.status(200).send({
-            message: 'Successfully Deleted Account',
-            status: 200
+        res.status(403).send({
+            message: 'Account is Not Sign In',
+            status: 403
         });
     }
 };
