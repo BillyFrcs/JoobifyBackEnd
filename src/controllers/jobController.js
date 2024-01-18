@@ -86,7 +86,9 @@ const postJob = async (req, res) => {
 
                 const date = new Date();
 
-                const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
+                const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
+
+                const currentDate = `${date.getDate()} ${date.toLocaleString('id', { month: 'long' })} ${date.getFullYear()}`;
 
                 // Object to send to the database
                 const jobData = {
@@ -99,7 +101,8 @@ const postJob = async (req, res) => {
                     requiredSkills: fields.requiredSkills,
                     jobDescription: fields.jobDescription,
                     companyProfileImage: companyProfileImage.size === 0 ? '' : imageURL,
-                    createdAt: getDateAndTime
+                    createdAt: getDateAndTime,
+                    postedOn: currentDate
                 };
 
                 // Added to the firestore collection
@@ -337,7 +340,9 @@ const updateUserJob = async (req, res) => {
 
                     const date = new Date();
 
-                    const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
+                    const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
+
+                    const currentDate = `${date.getDate()} ${date.toLocaleString('id', { month: 'long' })} ${date.getFullYear()}`;
 
                     // Object to send to the database
                     const jobData = {
@@ -350,7 +355,8 @@ const updateUserJob = async (req, res) => {
                         requiredSkills: fields.requiredSkills,
                         jobDescription: fields.jobDescription,
                         companyProfileImage: companyProfileImage.size === 0 ? '' : imageURL,
-                        updatedAt: getDateAndTime
+                        updatedAt: getDateAndTime,
+                        updatedOn: currentDate
                     };
 
                     // Update to the firestore collection
@@ -523,7 +529,7 @@ const addJob = async (req, res) => {
 
                 const date = new Date();
 
-                const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
+                const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
 
                 // Object to send to the database
                 const jobData = {
@@ -670,7 +676,7 @@ const updateJob = async (req, res) => {
 
                     const date = new Date();
 
-                    const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
+                    const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
 
                     // Object to send to the database
                     const jobData = {

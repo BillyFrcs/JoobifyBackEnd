@@ -23,7 +23,7 @@ const signUp = async (req, res) => {
             .then((credential) => {
                 const date = new Date();
 
-                const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
+                const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
 
                 UsersCollection.doc(credential.user.uid).set({
                     id: credential.user.uid,
@@ -318,7 +318,7 @@ const changeEmail = async (req, res) => {
                 .then(() => {
                     const date = new Date();
 
-                    const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
+                    const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
 
                     UsersCollection.doc(user.uid).update({
                         email: newEmail,
@@ -403,7 +403,7 @@ const changePassword = async (req, res) => {
                 .then(() => {
                     const date = new Date();
 
-                    const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
+                    const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
 
                     UsersCollection.doc(user.uid).update({
                         updatedAt: getDateAndTime

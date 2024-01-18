@@ -122,7 +122,7 @@ const updateUserAccountProfile = async (req, res) => {
 
                     const date = new Date();
 
-                    const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
+                    const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
 
                     // Object to send to the database
                     const userData = {
@@ -245,7 +245,7 @@ const updateUserAccountProfileByID = async (req, res) => {
 
                         const date = new Date();
 
-                        const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
+                        const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
 
                         // Object to send to the database
                         const userData = {
@@ -361,7 +361,7 @@ const editUserProfile = async (req, res) => {
 
                     const date = new Date();
 
-                    const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
+                    const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
 
                     // Object to send to the database
                     const userData = {
@@ -434,7 +434,7 @@ const editUserInformation = async (req, res) => {
 
                     const date = new Date();
 
-                    const getDateAndTime = date.toLocaleDateString() + '|' + date.toLocaleTimeString();
+                    const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
 
                     // Object to send to the database
                     const userData = {
