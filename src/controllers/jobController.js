@@ -476,7 +476,7 @@ const searchJob = async (req, res) => {
 
         if (results.length !== 0) {
             res.status(200).send({
-                message: 'Search Job',
+                message: 'Successfully found job',
                 status: 200,
                 total: snapshot.size,
                 data: results
