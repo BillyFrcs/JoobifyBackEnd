@@ -1,7 +1,7 @@
 const express = require('express');
 
 const { addJob, postJob, displayAllUsersJobs, displayUserJobs, displayJobDetail, updateUserJob, deleteUserJob,
-    getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob } = require('../controllers/jobController');
+    searchJob, getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob } = require('../controllers/jobController');
 
 const Middleware = require('../middleware/auth');
 
@@ -9,6 +9,7 @@ const router = express.Router();
 
 router.post('/addJob', Middleware.authenticate, addJob);
 router.post('/postJob', Middleware.authenticate, postJob);
+router.get('/search', searchJob);
 
 router.get('/displayAllUsersJobs', Middleware.authenticate, displayAllUsersJobs);
 router.get('/displayUserJobs', Middleware.authenticate, displayUserJobs);

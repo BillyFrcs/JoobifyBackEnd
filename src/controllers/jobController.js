@@ -462,6 +462,40 @@ const deleteUserJob = async (req, res) => {
     }
 };
 
+const searchJob = async (req, res) => {
+    try {
+        const search = req.query.job;
+
+        const snapshot = await JobsCollection.where('title', '==', search).get();
+
+        const results = [];
+
+        snapshot.forEach((doc) => {
+            results.push(doc.data());
+        });
+
+        if (results.length !== 0) {
+            res.status(200).send({
+                message: 'Search Job',
+                status: 200,
+                total: snapshot.size,
+                data: results
+            });
+        } else {
+            res.status(404).send({
+                message: 'No Job Found',
+                status: 404
+            });
+        }
+    } catch (error) {
+        res.status(400).send({
+            message: 'Something Went Wrong to Search Job',
+            status: 400,
+            error: error.message
+        });
+    }
+};
+
 const addJob = async (req, res) => {
     try {
         const user = firebaseApp.auth().currentUser;
@@ -779,5 +813,5 @@ const deleteJob = async (req, res) => {
 
 module.exports = {
     addJob, postJob, displayAllUsersJobs, displayUserJobs, displayJobDetail, updateUserJob,
-    deleteUserJob, getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob
+    deleteUserJob, searchJob, getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob
 };
