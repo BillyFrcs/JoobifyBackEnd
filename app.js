@@ -20,9 +20,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(helmet());
 
-app.use('/api/jobs', Job.routes);
-app.use('/api/auth', Auth.routes);
-app.use('/api/users', User.routes);
+app.use('/jobs', Job.routes);
+app.use('/auth', Auth.routes);
+app.use('/users', User.routes);
 
 app.use(HttpError.httpErrorRequest);
 app.use(HttpError.httpErrorResponse);
