@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { signUp, signIn, logOut, verifyEmail, forgotPassword, changeEmail, changePassword,
+const { signUp, signIn, logOut, verifyEmail, resetPassword, changeEmail, changePassword,
     deleteAccount, deleteAccountByID } = require('../controllers/authController');
 
 const Middleware = require('../middleware/auth');
@@ -11,7 +11,7 @@ router.post('/signUp', signUp);
 router.post('/signIn', signIn);
 router.post('/logOut', Middleware.authenticate, logOut);
 router.post('/verifyEmail', Middleware.authenticate, verifyEmail);
-router.post('/forgotPassword', forgotPassword);
+router.post('/resetPassword', resetPassword);
 
 router.put('/changeEmail', Middleware.authenticate, changeEmail);
 router.put('/changePassword', Middleware.authenticate, changePassword);

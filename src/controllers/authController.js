@@ -214,7 +214,7 @@ const verifyEmail = async (req, res) => {
     }
 };
 
-const forgotPassword = async (req, res) => {
+const resetPassword = async (req, res) => {
     try {
         if (!req.body.email) {
             return res.status(422).json({
@@ -465,6 +465,6 @@ const deleteAccountByID = async (req, res) => {
 };
 
 module.exports = {
-    signUp, signIn, logOut, verifyEmail, forgotPassword, changeEmail,
+    signUp, signIn, logOut, verifyEmail, resetPassword, changeEmail,
     changePassword, deleteAccount, deleteAccountByID
 };
