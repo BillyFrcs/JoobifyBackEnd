@@ -27,7 +27,7 @@ const postJob = async (req, res) => {
             // Default implementation
             form.parse(req, async (error, fields, files) => {
                 // Create validation of the fields and files
-                if (!fields.title || !fields.companyName || !fields.location || !fields.email || !fields.jobType || !fields.requiredSkills || !fields.jobDescription || !files.companyProfileImage) {
+                if (!fields.title || !fields.companyName || !fields.location || !fields.email || !fields.jobType || !fields.jobDescription || !files.companyProfileImage) {
                     return res.status(400).json({
                         message: 'Please Fill All Required Input Fields',
                         status: 400
@@ -98,7 +98,6 @@ const postJob = async (req, res) => {
                     location: fields.location,
                     email: fields.email,
                     jobType: fields.jobType,
-                    requiredSkills: fields.requiredSkills,
                     jobDescription: fields.jobDescription,
                     companyProfileImage: companyProfileImage.size === 0 ? '' : imageURL,
                     createdAt: getDateAndTime,
@@ -288,7 +287,7 @@ const updateUserJob = async (req, res) => {
                 // Default implementation
                 form.parse(req, async (error, fields, files) => {
                     // Create validation of the fields and files
-                    if (!fields.title || !fields.companyName || !fields.location || !fields.email || !fields.jobType || !fields.requiredSkills || !fields.jobDescription || !files.companyProfileImage) {
+                    if (!fields.title || !fields.companyName || !fields.location || !fields.email || !fields.jobType || !fields.jobDescription || !files.companyProfileImage) {
                         return res.status(400).json({
                             message: 'Please fill all the required input fields',
                             status: 400
@@ -352,7 +351,6 @@ const updateUserJob = async (req, res) => {
                         location: fields.location,
                         email: fields.email,
                         jobType: fields.jobType,
-                        requiredSkills: fields.requiredSkills,
                         jobDescription: fields.jobDescription,
                         companyProfileImage: companyProfileImage.size === 0 ? '' : imageURL,
                         updatedAt: getDateAndTime,
@@ -506,7 +504,7 @@ const addJob = async (req, res) => {
             // Default implementation
             form.parse(req, async (error, fields, files) => {
                 // Create validation of the fields and files
-                if (!fields.title || !fields.companyName || !fields.location || !fields.email || !fields.jobType || !fields.requiredSkills || !fields.jobDescription || !files.companyProfileImage) {
+                if (!fields.title || !fields.companyName || !fields.location || !fields.email || !fields.jobType || !fields.jobDescription || !files.companyProfileImage) {
                     return res.status(400).json({
                         message: 'Please Fill All Required Input Fields',
                         status: 400
@@ -573,7 +571,6 @@ const addJob = async (req, res) => {
                     location: fields.location,
                     email: fields.email,
                     jobType: fields.jobType,
-                    requiredSkills: fields.requiredSkills,
                     jobDescription: fields.jobDescription,
                     companyProfileImage: companyProfileImage.size === 0 ? '' : imageURL,
                     createdAt: getDateAndTime
@@ -658,7 +655,7 @@ const updateJob = async (req, res) => {
                 // Default implementation
                 form.parse(req, async (error, fields, files) => {
                     // Create validation of the fields and files
-                    if (!fields.title || !fields.companyName || !fields.location || !fields.email || !fields.jobType || !fields.requiredSkills || !fields.jobDescription || !files.companyProfileImage) {
+                    if (!fields.title || !fields.companyName || !fields.location || !fields.email || !fields.jobType || !fields.jobDescription || !files.companyProfileImage) {
                         return res.status(400).json({
                             message: 'Please Fill All Required Input Fields',
                             status: 400
@@ -719,7 +716,6 @@ const updateJob = async (req, res) => {
                         location: fields.location,
                         email: fields.email,
                         jobType: fields.jobType,
-                        requiredSkills: fields.requiredSkills,
                         jobDescription: fields.jobDescription,
                         companyProfileImage: companyProfileImage.size === 0 ? '' : imageURL,
                         updatedAt: getDateAndTime
