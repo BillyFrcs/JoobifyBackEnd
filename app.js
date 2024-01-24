@@ -14,10 +14,16 @@ const app = express();
 const port = process.env.PORT || 8080;
 const hostname = process.env.NODE_ENV !== 'production' ? 'localhost' : '0.0.0.0';
 
+const corsOptions = {
+  origin: '*',
+  credentials: true,
+  optionSuccessStatus: 200
+};
+
 app.use(express.json());
 app.use(express.static('./public/'));
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(helmet());
 
 app.use('/jobs', Job.routes);
