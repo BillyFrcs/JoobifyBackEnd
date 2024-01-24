@@ -67,7 +67,7 @@ const updateUserAccountProfile = async (req, res) => {
                 // Default implementation
                 form.parse(req, async (error, fields, files) => {
                     // Create validation of the fields and files
-                    if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !fields.skills || !files.userProfileImage || !fields.about) {
+                    if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !files.userProfileImage || !fields.about) {
                         return res.status(422).json({
                             message: 'Please Fill Out All Fields',
                             status: 422
@@ -130,7 +130,6 @@ const updateUserAccountProfile = async (req, res) => {
                         phoneNumber: fields.phoneNumber,
                         headline: fields.headline,
                         location: fields.location,
-                        skills: fields.skills,
                         userProfileImage: userProfileImage.size === 0 ? '' : imageURL,
                         about: fields.about,
                         updatedAt: getDateAndTime
@@ -190,7 +189,7 @@ const updateUserAccountProfileByID = async (req, res) => {
                     // Default implementation
                     form.parse(req, async (error, fields, files) => {
                         // Create validation of the fields and files
-                        if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !fields.skills || !files.userProfileImage || !fields.about) {
+                        if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !files.userProfileImage || !fields.about) {
                             return res.status(422).json({
                                 message: 'Please Fill Out All Fields',
                                 status: 422
@@ -253,7 +252,6 @@ const updateUserAccountProfileByID = async (req, res) => {
                             phoneNumber: fields.phoneNumber,
                             headline: fields.headline,
                             location: fields.location,
-                            skills: fields.skills,
                             userProfileImage: userProfileImage.size === 0 ? '' : imageURL,
                             about: fields.about,
                             updatedAt: getDateAndTime
@@ -415,7 +413,7 @@ const editUserInformation = async (req, res) => {
                 // Default implementation
                 form.parse(req, async (error, fields) => {
                     // Create validation of the fields
-                    if (!fields.headline || !fields.location || !fields.skills || !fields.about) {
+                    if (!fields.headline || !fields.location || !fields.about) {
                         return res.status(400).send({
                             message: 'All Fields are Required',
                             status: 400
@@ -439,7 +437,6 @@ const editUserInformation = async (req, res) => {
                     // Object to send to the database
                     const userData = {
                         headline: fields.headline,
-                        skills: fields.skills,
                         location: fields.location,
                         about: fields.about,
                         updatedAt: getDateAndTime

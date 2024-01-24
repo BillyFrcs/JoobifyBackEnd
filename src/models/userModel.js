@@ -15,8 +15,6 @@ const getAllUsersAccountProfile = async (req, res, collection) => {
                 email: doc.data().email,
                 headline: doc.data().headline,
                 location: doc.data().location,
-                status: doc.data().status,
-                skills: doc.data().skills,
                 userProfileImage: doc.data().userProfileImage,
                 about: doc.data().about,
                 createdAt: doc.data().createdAt,

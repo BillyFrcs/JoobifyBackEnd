@@ -32,7 +32,6 @@ const signUp = async (req, res) => {
                     email: credential.user.email,
                     phoneNumber: req.body.phoneNumber || "Empty",
                     location: req.body.location || "Empty",
-                    skills: req.body.skill || "Empty",
                     userProfileImage: defaultUserProfile,
                     about: req.body.about || "Empty",
                     createdAt: getDateAndTime,
