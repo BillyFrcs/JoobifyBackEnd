@@ -112,9 +112,16 @@ const signIn = async (req, res) => {
                 });
             })
             .catch((error) => {
-                if (error.code === 'auth/wrong-password') {
+                console.log(error.code);
+                if (error.code === 'auth/user-not-found') {
                     return res.status(500).send({
-                        message: 'Invalid Email or Password',
+                        message: 'Email is not found',
+                        status: 500,
+                        error: error.message
+                    });
+                } else if (error.code === 'auth/wrong-password') {
+                    return res.status(500).send({
+                        message: 'Wrong password entered',
                         status: 500,
                         error: error.message
                     });
