@@ -115,13 +115,13 @@ const signIn = async (req, res) => {
                 console.log(error.code);
                 if (error.code === 'auth/user-not-found') {
                     return res.status(500).send({
-                        message: 'Email is not found',
+                        message: 'User email is not found',
                         status: 500,
                         error: error.message
                     });
                 } else if (error.code === 'auth/wrong-password') {
                     return res.status(500).send({
-                        message: 'Wrong password entered',
+                        message: 'Wrong user password',
                         status: 500,
                         error: error.message
                     });
