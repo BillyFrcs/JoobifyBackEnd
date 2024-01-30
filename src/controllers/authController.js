@@ -127,7 +127,7 @@ const signIn = async (req, res) => {
                     });
                 } else {
                     return res.status(500).send({
-                        message: 'Invalid Email or Password',
+                        message: 'Invalid user email or password',
                         status: 500,
                         error: error.message
                     });
