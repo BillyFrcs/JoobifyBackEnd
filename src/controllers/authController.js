@@ -112,7 +112,8 @@ const signIn = async (req, res) => {
                 });
             })
             .catch((error) => {
-                console.log(error.code);
+                // console.log(error.code);
+                
                 if (error.code === 'auth/user-not-found') {
                     return res.status(500).send({
                         message: 'User email is not found',
