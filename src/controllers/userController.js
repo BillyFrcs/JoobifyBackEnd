@@ -468,7 +468,42 @@ const editUserInformation = async (req, res) => {
     }
 };
 
+const contactForm = async (req, res) => {
+    try {
+        const { name, email, message } = req.body;
+
+        // Validate form data
+        if (!name || !email || !message) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
+        const database = firebaseAdmin.database();
+        const reference = database.ref('ContactForm');
+
+        reference.push({
+            name,
+            email,
+            message
+        }).then(() => {
+            res.status(202).send({
+                message: 'Form submitted successfully',
+                status: 202
+            });
+        }).catch((error) => {
+            // console.error('Error adding document: ', error);
+
+            res.status(500).json({ error: 'Something went wrong, please try again later' });
+        });
+    } catch (error) {
+        res.status(400).send({
+            message: 'Something Went Wrong to Contact Form',
+            status: 400,
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     getAllUsersAccountProfile, getUserAccountProfile, getUserAccountProfileByID, updateUserAccountProfile,
-    updateUserAccountProfileByID, editUserProfile, editUserInformation
+    updateUserAccountProfileByID, editUserProfile, editUserInformation, contactForm
 };

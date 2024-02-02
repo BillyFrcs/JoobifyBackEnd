@@ -1,7 +1,7 @@
 const express = require('express');
 
 const { getAllUsersAccountProfile, getUserAccountProfile, getUserAccountProfileByID, updateUserAccountProfile, updateUserAccountProfileByID,
-    editUserProfile, editUserInformation } = require('../controllers/userController');
+    editUserProfile, editUserInformation, contactForm } = require('../controllers/userController');
 
 const Middleware = require('../middleware/auth');
 
@@ -15,5 +15,7 @@ router.put('/updateUserAccountProfile', Middleware.authenticate, updateUserAccou
 router.put('/updateUserAccountProfile/:id', Middleware.authenticate, updateUserAccountProfileByID);
 router.put('/editUserProfile', Middleware.authenticate, editUserProfile);
 router.put('/editUserInformation', Middleware.authenticate, editUserInformation);
+
+router.post('/contact', contactForm);
 
 module.exports = { routes: router };
