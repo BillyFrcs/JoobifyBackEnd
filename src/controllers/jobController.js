@@ -264,6 +264,43 @@ const displayJobDetail = async (req, res) => {
     }
 };
 
+const jobDetail = async (req, res) => {
+    try {
+        const jobID = req.params.id;
+        const job = await JobsCollection.doc(jobID).get();
+
+        if (!job.exists) {
+            res.status(404).send({
+                message: 'Cannot Found Job Detail',
+                status: 404
+            });
+        } else {
+            res.status(200).send({
+                message: 'Job Detail',
+                status: 200,
+                data: job.data()
+            });
+        }
+
+        /* Using list
+        await collection.where('id', '==', req.params.id).get().then((value) => {
+            const job = value.docs.map((document) => document.data());
+    
+            res.status(200).send({
+                message: 'Display Job Detail',
+                data: job
+            });
+        });
+        */
+    } catch (error) {
+        res.status(400).send({
+            message: 'Something Went Wrong to Display Job Detail',
+            status: 400,
+            error: error.message
+        });
+    }
+};
+
 const updateUserJob = async (req, res) => {
     try {
         const user = firebaseApp.auth().currentUser;
@@ -808,6 +845,6 @@ const deleteJob = async (req, res) => {
 };
 
 module.exports = {
-    addJob, postJob, displayAllUsersJobs, displayUserJobs, displayJobDetail, updateUserJob,
+    addJob, postJob, displayAllUsersJobs, displayUserJobs, displayJobDetail, jobDetail, updateUserJob,
     deleteUserJob, searchJob, getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob
 };
