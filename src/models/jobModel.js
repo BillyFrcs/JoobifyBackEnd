@@ -6,6 +6,8 @@ const getAllJobs = async (req, res, collection) => {
         const limit = parseInt(req.query.limit, 10) || 10; // Number of items per page
         const offset = (page - 1) * limit;
 
+        const snapshot = await collection.count().get();
+
         // Query Firestore
         const querySnapshot = await collection
             .orderBy('createdAt') // Order by a field, adjust as per your requirement
@@ -34,7 +36,8 @@ const getAllJobs = async (req, res, collection) => {
             status: 200,
             page: response.page,
             limit: response.limit,
-            total: response.totalItems,
+            totalItem: items.length,
+            total: snapshot.data().count,
             data: response.data
         });
     } catch (error) {
@@ -75,7 +78,8 @@ const getAllJobs = async (req, res, collection) => {
             status: 200,
             page: response.page,
             limit: response.limit,
-            total: response.totalItems,
+            totalItem: response.totalItems,
+            total: snapshot.data().count,
             data: response.data
         });
     } catch (error) {
