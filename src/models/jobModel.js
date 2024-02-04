@@ -1,6 +1,92 @@
 const firebaseApp = require('../config/firebaseApp');
 
 const getAllJobs = async (req, res, collection) => {
+    try {
+        const page = parseInt(req.query.page, 10) || 1; // Current page number
+        const limit = parseInt(req.query.limit, 10) || 10; // Number of items per page
+        const offset = (page - 1) * limit;
+
+        // Query Firestore
+        const querySnapshot = await collection
+            .orderBy('createdAt') // Order by a field, adjust as per your requirement
+            .offset(offset) // Start from the specified offset
+            .limit(limit) // Limit the number of documents returned
+            .get();
+
+        const items = [];
+
+        querySnapshot.forEach((doc) => {
+            items.push(doc.data());
+        });
+
+        // Construct response object
+        const response = {
+            page,
+            limit,
+            totalItems: items.length, // You may need to get the total count in a separate query
+            data: items
+        };
+
+        // res.json(response);
+
+        res.status(200).send({
+            message: 'All Jobs Listing',
+            status: 200,
+            page: response.page,
+            limit: response.limit,
+            total: response.totalItems,
+            data: response.data
+        });
+    } catch (error) {
+        res.status(500).send({
+            message: 'Internal Server Error',
+            status: 500
+        });
+    }
+
+    /*
+    try {
+        const page = parseInt(req.query.page, 10) || 1; // Current page number
+        const offset = (page - 1);
+
+        // Query Firestore
+        const querySnapshot = await collection
+            .orderBy('createdAt') // Order by a field, adjust as per your requirement
+            .offset(offset) // Start from the specified offset
+            .get();
+
+        const items = [];
+
+        querySnapshot.forEach((doc) => {
+            items.push(doc.data());
+        });
+
+        // Construct response object
+        const response = {
+            page,
+            totalItems: items.length, // You may need to get the total count in a separate query
+            data: items
+        };
+
+        // res.json(response);
+
+        res.status(200).send({
+            message: 'All Jobs Listing',
+            status: 200,
+            page: response.page,
+            limit: response.limit,
+            total: response.totalItems,
+            data: response.data
+        });
+    } catch (error) {
+        res.status(500).send({
+            message: 'Internal Server Error',
+            status: 500
+        });
+    }
+    */
+
+    /* Default implementation
     const snapshot = await collection.count().get();
 
     // console.log(snapshot.data().count);
@@ -23,6 +109,7 @@ const getAllJobs = async (req, res, collection) => {
             });
         }
     });
+    */
 };
 
 const getAllUserJobs = async (req, res, collection) => {
