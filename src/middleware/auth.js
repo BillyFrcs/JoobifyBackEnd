@@ -2,7 +2,7 @@ const AuthModel = require('../models/authModel');
 
 const authenticate = async (req, res, next) => {
     try {
-        AuthModel.authenticate(req, res, next);
+        AuthModel.authentication(req, res, next);
     } catch (error) {
         res.status(500).json({
             message: 'Something Went Wrong With The Server, Please Try Again.',

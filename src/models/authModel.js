@@ -16,7 +16,7 @@ const CloudStorage = new Storage({
     key = 'authorization' and the value = accessToken 
     and store it in req.user so we can use the req.user in controller
 */
-const authenticate = async (req, res, next) => {
+const authentication = async (req, res, next) => {
     const authorizationHeader = req.headers.authorization || req.headers.Authorization;
 
     if (authorizationHeader) {
@@ -68,18 +68,46 @@ const deleteProfileStorage = async (uid) => {
     }
 };
 
+const deleteJobsStorage = async (uid) => {
+    try {
+        const bucket = CloudStorage.bucket(`${process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME}.appspot.com`);
+
+        // Delete the folder itself
+        bucket.deleteFiles({
+            prefix: `${process.env.JOBS_COLLECTION}/${uid}`
+        });
+
+        /*
+        // Delete files in the folder
+        bucket.deleteFiles({
+          prefix: filePath
+        });
+        */
+
+        // console.log('Folder deleted successfully.');
+    } catch (error) {
+        throw new Error('Error Deleting Folder: ', error);
+    }
+};
+
 // Delete user account from authentication and firestore
 const deleteAccount = async (req, res, firebase, collection) => {
     const user = firebase.auth().currentUser;
 
-    if (user && req.user.uid) {
+    const usersCollection = collection.doc(user.uid);
+
+    // console.log(user.uid);
+
+    if (user) {
         await user.delete()
             .then(() => {
                 // Delete the user's account profile from firestore
-                collection.doc(user.uid).delete();
+                firebaseAdmin.firestore().recursiveDelete(usersCollection);
+                // collection.doc(user.uid).delete();
 
                 // Delete the user's account profile from storage
-                deleteProfileStorage(user.uid || req.user.uid);
+                deleteProfileStorage(user.uid);
+                deleteJobsStorage(user.uid);
             })
             .then(() => res.status(200)
                 .send({
@@ -101,6 +129,8 @@ const deleteAccountByID = async (req, res, firebase, collection) => {
 
     const profile = await collection.doc(userID).get();
 
+    const usersCollection = collection.doc(user.uid);
+
     // Check if the userID is empty or not
     if (user || req.user.uid) {
         if (!profile.exists) {
@@ -110,13 +140,16 @@ const deleteAccountByID = async (req, res, firebase, collection) => {
             });
         } else {
             // Delete the user's account profile from authentication
-            await firebase.auth().currentUser.delete();
+            await firebaseAdmin.firestore().recursiveDelete(usersCollection);
+
+            // await firebase.auth().currentUser.delete();
 
             // Delete the user's account profile from firestore
             await collection.doc(userID).delete();
 
             // Delete the user's account profile from storage
             await deleteProfileStorage(userID);
+            await deleteJobsStorage(userID);
 
             res.status(200).send({
                 message: 'Successfully Deleted Account',
@@ -131,4 +164,4 @@ const deleteAccountByID = async (req, res, firebase, collection) => {
     }
 };
 
-module.exports = { authenticate, deleteAccount, deleteAccountByID };
+module.exports = { authentication, deleteAccount, deleteAccountByID };
