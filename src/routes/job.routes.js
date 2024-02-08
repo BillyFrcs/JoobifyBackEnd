@@ -1,7 +1,7 @@
 const express = require('express');
 
-const { addJob, postJob, displayAllUsersJobs, displayUserJobs, displayJobDetail, jobDetail, updateUserJob, deleteUserJob,
-    searchJob, getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob } = require('../controllers/jobController');
+const { addJob, postJob, displayAllUsersJobs, displayAllJobs, displayUserJobs, displayJobDetail, jobDetail, updateUserJob, deleteUserJob,
+    searchJob, getAllUserJobs, getJobDetail, updateJob, deleteJob } = require('../controllers/jobController');
 
 const Middleware = require('../middleware/auth');
 
@@ -15,7 +15,7 @@ router.get('/displayAllUsersJobs', Middleware.authenticate, displayAllUsersJobs)
 router.get('/displayUserJobs', Middleware.authenticate, displayUserJobs);
 router.get('/displayJobDetail/:id', Middleware.authenticate, displayJobDetail);
 router.get('/jobDetail/:id', jobDetail);
-router.get('/allJobs', getAllJobs);
+router.get('/allJobs', displayAllJobs);
 router.get('/allUserJobs', Middleware.authenticate, getAllUserJobs);
 router.get('/job/:id', Middleware.authenticate, getJobDetail);
 

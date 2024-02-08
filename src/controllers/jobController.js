@@ -174,6 +174,18 @@ const displayAllUsersJobs = async (req, res) => {
     }
 };
 
+const displayAllJobs = async (req, res) => {
+    try {
+        JobModel.getAllJobs(req, res, JobsCollection);
+    } catch (error) {
+        res.status(400).send({
+            message: 'Something Went Wrong to Display All Jobs Listing',
+            status: 400,
+            error: error.message
+        });
+    }
+};
+
 const displayUserJobs = async (req, res) => {
     try {
         const user = firebaseApp.auth().currentUser;
@@ -637,18 +649,6 @@ const addJob = async (req, res) => {
     }
 };
 
-const getAllJobs = async (req, res) => {
-    try {
-        JobModel.getAllJobs(req, res, JobsCollection);
-    } catch (error) {
-        res.status(400).send({
-            message: 'Something Went Wrong to Display All Jobs Listing',
-            status: 400,
-            error: error.message
-        });
-    }
-};
-
 const getAllUserJobs = async (req, res) => {
     try {
         JobModel.getAllUserJobs(req, res, JobsCollection);
@@ -845,6 +845,6 @@ const deleteJob = async (req, res) => {
 };
 
 module.exports = {
-    addJob, postJob, displayAllUsersJobs, displayUserJobs, displayJobDetail, jobDetail, updateUserJob,
-    deleteUserJob, searchJob, getAllJobs, getAllUserJobs, getJobDetail, updateJob, deleteJob
+    addJob, postJob, displayAllUsersJobs, displayAllJobs, displayUserJobs, displayJobDetail, jobDetail, updateUserJob,
+    deleteUserJob, searchJob, getAllUserJobs, getJobDetail, updateJob, deleteJob
 };
