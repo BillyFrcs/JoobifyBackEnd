@@ -42,7 +42,7 @@ const getAllUsersAccountProfile = async (req, res, collection) => {
 };
 
 // Get the current user's account profile by login with email and password
-const getUserAccountProfile = async (req, res, firebase, collection) => {
+const displayUserAccountProfile = async (req, res, firebase, collection) => {
     const user = firebase.auth().currentUser;
 
     // console.log(req.user.uid);
@@ -98,4 +98,4 @@ const getUserAccountProfileByID = async (req, res, collection) => {
     }
 };
 
-module.exports = { getAllUsersAccountProfile, getUserAccountProfile, getUserAccountProfileByID };
+module.exports = { getAllUsersAccountProfile, displayUserAccountProfile, getUserAccountProfileByID };

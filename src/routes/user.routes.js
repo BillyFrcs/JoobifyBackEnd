@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { getAllUsersAccountProfile, getUserAccountProfile, getUserAccountProfileByID, updateUserAccountProfile, updateUserAccountProfileByID,
+const { getAllUsersAccountProfile, displayUserAccountProfile, getUserAccountProfileByID, updateUserAccountProfile, updateUserAccountProfileByID,
     editUserProfile, editUserInformation, contactForm } = require('../controllers/userController');
 
 const Middleware = require('../middleware/auth');
@@ -8,7 +8,7 @@ const Middleware = require('../middleware/auth');
 const router = express.Router();
 
 router.get('/allUsersProfile', getAllUsersAccountProfile);
-router.get('/userProfile', Middleware.authenticate, getUserAccountProfile);
+router.get('/userProfile', Middleware.authenticate, displayUserAccountProfile);
 router.get('/userProfile/:id', Middleware.authenticate, getUserAccountProfileByID);
 
 router.put('/updateUserAccountProfile', Middleware.authenticate, updateUserAccountProfile);

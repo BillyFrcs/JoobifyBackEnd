@@ -29,7 +29,7 @@ const getAllUsersAccountProfile = async (req, res) => {
 };
 
 // Get the current user's account profile by login with email and password
-const getUserAccountProfile = async (req, res) => {
+const displayUserAccountProfile = async (req, res) => {
     try {
         UserModel.getUserAccountProfile(req, res, firebaseApp, UsersCollection);
     } catch (error) {
@@ -504,6 +504,6 @@ const contactForm = async (req, res) => {
 };
 
 module.exports = {
-    getAllUsersAccountProfile, getUserAccountProfile, getUserAccountProfileByID, updateUserAccountProfile,
+    getAllUsersAccountProfile, displayUserAccountProfile, getUserAccountProfileByID, updateUserAccountProfile,
     updateUserAccountProfileByID, editUserProfile, editUserInformation, contactForm
 };
