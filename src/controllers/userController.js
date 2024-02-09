@@ -31,7 +31,7 @@ const getAllUsersAccountProfile = async (req, res) => {
 // Get the current user's account profile by login with email and password
 const displayUserAccountProfile = async (req, res) => {
     try {
-        UserModel.getUserAccountProfile(req, res, firebaseApp, UsersCollection);
+        UserModel.displayUserAccountProfile(req, res, firebaseApp, UsersCollection);
     } catch (error) {
         res.status(400).send({
             message: 'Something Went Wrong to Display User Account Profile',
