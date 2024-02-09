@@ -176,7 +176,7 @@ const displayAllUsersJobs = async (req, res) => {
 
 const displayAllJobs = async (req, res) => {
     try {
-        JobModel.getAllJobs(req, res, JobsCollection);
+        JobModel.displayAllJobs(req, res, JobsCollection);
     } catch (error) {
         res.status(400).send({
             message: 'Something Went Wrong to Display All Jobs Listing',

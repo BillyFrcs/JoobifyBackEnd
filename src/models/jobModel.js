@@ -1,6 +1,6 @@
 const firebaseApp = require('../config/firebaseApp');
 
-const getAllJobs = async (req, res, collection) => {
+const displayAllJobs = async (req, res, collection) => {
     try {
         const page = parseInt(req.query.page, 10) || 1; // Current page number
         const limit = parseInt(req.query.limit, 10) || 10; // Number of items per page
@@ -185,4 +185,4 @@ const getJobDetail = async (req, res, collection) => {
     }
 };
 
-module.exports = { getAllJobs, getAllUserJobs, getJobDetail };
+module.exports = { displayAllJobs, getAllUserJobs, getJobDetail };
