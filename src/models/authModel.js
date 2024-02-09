@@ -97,8 +97,9 @@ const deleteAccount = async (req, res, firebase, collection) => {
     const usersCollection = collection.doc(user.uid);
 
     // console.log(user.uid);
+    // console.log(req.user.uid);
 
-    if (user) {
+    if (user && req.user.uid) {
         await user.delete()
             .then(() => {
                 // Delete the user's account profile from firestore
@@ -132,7 +133,7 @@ const deleteAccountByID = async (req, res, firebase, collection) => {
     const usersCollection = collection.doc(user.uid);
 
     // Check if the userID is empty or not
-    if (user || req.user.uid) {
+    if (user && req.user.uid) {
         if (!profile.exists) {
             res.status(404).send({
                 message: 'Account is Not Found',

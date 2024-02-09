@@ -77,7 +77,7 @@ const getUserAccountProfileByID = async (req, res, collection) => {
     const user = firebaseApp.auth().currentUser;
     const profile = await collection.doc(userID).get();
 
-    if (user || req.user.uid) {
+    if (user && req.user.uid) {
         if (!profile.exists) {
             res.status(404).send({
                 message: 'User is Not Found',

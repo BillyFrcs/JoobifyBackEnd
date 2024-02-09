@@ -471,7 +471,7 @@ const deleteUserJob = async (req, res) => {
         const user = firebaseApp.auth().currentUser;
         const userID = user.uid || req.user.uid;
 
-        if (user || req.user.uid) {
+        if (user && req.user.uid) {
             const jobID = req.params.id;
             const job = await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).doc(jobID).get();
 
@@ -810,7 +810,7 @@ const deleteJob = async (req, res) => {
     try {
         const user = firebaseApp.auth().currentUser;
 
-        if (user || req.user.uid) {
+        if (user && req.user.uid) {
             const jobID = req.params.id;
             const job = await JobsCollection.doc(jobID).get();
 
