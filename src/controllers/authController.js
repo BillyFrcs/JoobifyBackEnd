@@ -25,15 +25,17 @@ const signUp = async (req, res) => {
 
                 const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
 
+                const EMPTY = "-";
+
                 UsersCollection.doc(credential.user.uid).set({
                     id: credential.user.uid,
                     name: req.body.name,
-                    headline: req.body.headline || "Empty",
+                    headline: req.body.headline || EMPTY,
                     email: credential.user.email,
-                    phoneNumber: req.body.phoneNumber || "Empty",
-                    location: req.body.location || "Empty",
+                    phoneNumber: req.body.phoneNumber || EMPTY,
+                    location: req.body.location || EMPTY,
                     userProfileImage: defaultUserProfile,
-                    about: req.body.about || "Empty",
+                    about: req.body.about || EMPTY,
                     createdAt: getDateAndTime,
                     updatedAt: "Hasn't been Updated yet"
                 });
