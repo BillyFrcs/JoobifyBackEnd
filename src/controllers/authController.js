@@ -74,8 +74,8 @@ const signUp = async (req, res) => {
                     res.send({
                         message: 'Successfully Sign Up Account',
                         status: 201,
+                        accessToken: idToken,
                         data,
-                        accessToken: idToken
                     });
 
                     // It'll shows the Firebase access token for the current user
