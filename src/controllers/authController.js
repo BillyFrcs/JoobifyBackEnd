@@ -61,12 +61,27 @@ const signUp = async (req, res) => {
                     });
                 }
             })
+            /* Default Response without token 
             .then((data) => res.status(201)
                 .send({
                     message: 'Successfully Sign Up Account',
                     status: 201,
                     data
                 }))
+            */
+            .then((data) => {
+                firebaseApp.auth().currentUser.getIdToken().then((idToken) => {
+                    res.send({
+                        message: 'Successfully Sign Up Account',
+                        status: 201,
+                        data,
+                        accessToken: idToken
+                    });
+
+                    // It'll shows the Firebase access token for the current user
+                    // console.log(idToken);
+                });
+            })
             .catch((error) => {
                 if (error.code === 'auth/weak-password') {
                     return res.status(500).send({
@@ -115,7 +130,7 @@ const signIn = async (req, res) => {
             })
             .catch((error) => {
                 // console.log(error.code);
-                
+
                 if (error.code === 'auth/user-not-found') {
                     return res.status(500).send({
                         message: 'User email is not found',
