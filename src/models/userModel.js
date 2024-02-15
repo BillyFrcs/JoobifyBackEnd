@@ -74,10 +74,10 @@ const displayUserAccountProfile = async (req, res, firebase, collection) => {
 // Get the user's account profile by id
 const getUserAccountProfileByID = async (req, res, collection) => {
     const userID = req.params.id;
-    const user = firebaseApp.auth().currentUser;
+    // const user = firebaseApp.auth().currentUser;
     const profile = await collection.doc(userID).get();
 
-    if (user && req.user.uid) {
+    if (req.user.uid && userID) {
         if (!profile.exists) {
             res.status(404).send({
                 message: 'User is Not Found',
