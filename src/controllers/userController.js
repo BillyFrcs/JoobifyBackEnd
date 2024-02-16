@@ -57,14 +57,15 @@ const getUserAccountProfileByID = async (req, res) => {
 // Update the current user's account profile by login with email and password
 const updateUserAccountProfile = async (req, res) => {
     try {
-        // const user = firebaseApp.auth().currentUser;
+        const user = firebaseApp.auth().currentUser;
+        const userID = req.user.uid;
 
-        const user = req.user.uid;
+        // const user = req.user.uid;
 
         const form = new formidable.IncomingForm({ multiples: true });
 
-        if (user) {
-            await UsersCollection.doc(user).get().then(() => {
+        if (user && userID) {
+            await UsersCollection.doc(userID).get().then(() => {
                 // Default implementation
                 form.parse(req, async (error, fields, files) => {
                     // Create validation of the fields and files
@@ -106,7 +107,7 @@ const updateUserAccountProfile = async (req, res) => {
                         });
                     } else {
                         const imageResponse = await bucket.upload(userProfileImage.path, {
-                            destination: `${process.env.USERS_COLLECTION}/${user}/${userProfileImage.name}`,
+                            destination: `${process.env.USERS_COLLECTION}/${userID}/${userProfileImage.name}`,
                             resumable: true,
                             metadata: {
                                 metadata: {
@@ -137,9 +138,9 @@ const updateUserAccountProfile = async (req, res) => {
                     };
 
                     // Added to the firestore collection
-                    await UsersCollection.doc(user).update(userData, { merge: true })
+                    await UsersCollection.doc(userID).update(userData, { merge: true })
                         .then(() => {
-                            firebaseApp.auth().currentUser.updateProfile({
+                            user.currentUser.updateProfile({
                                 displayName: userData.name,
                                 phoneNumber: userData.phoneNumber,
                                 photoURL: userData.userProfileImage
