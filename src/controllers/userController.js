@@ -64,7 +64,7 @@ const updateUserAccountProfile = async (req, res) => {
 
         const form = new formidable.IncomingForm({ multiples: true });
 
-        if (user && req.user.uid) {
+        if (user) {
             await UsersCollection.doc(user).get().then(() => {
                 // Default implementation
                 form.parse(req, async (error, fields, files) => {
