@@ -286,16 +286,16 @@ const changeEmail = async (req, res) => {
 
         const user = firebaseApp.auth().currentUser;
 
-        const { newEmail, password } = req.body;
-
-        if (!(newEmail && password)) {
-            return res.status(422).json({
-                message: 'Please Fill Out All Fields',
-                status: 422
-            });
-        }
-
         if (userID) {
+            const { newEmail, password } = req.body;
+
+            if (!(newEmail && password)) {
+                return res.status(422).json({
+                    message: 'Please Fill Out All Fields',
+                    status: 422
+                });
+            }
+
             const credential = firebaseApp.auth.EmailAuthProvider.credential(
                 user.email,
                 password
@@ -324,7 +324,7 @@ const changeEmail = async (req, res) => {
                         .catch((error) => {
                             if (error.code === 'auth/invalid-email') {
                                 return res.status(500).send({
-                                    message: 'Invalid Email',
+                                    message: 'Invalid email',
                                     status: 500,
                                     error: error.message
                                 });
@@ -336,7 +336,7 @@ const changeEmail = async (req, res) => {
                                 });
                             } else if (error.code === 'auth/requires-recent-login') {
                                 return res.status(500).send({
-                                    message: 'User Needs to Re-Authenticate Recent Login',
+                                    message: 'User Needs to Re-Authenticate recent login',
                                     status: 500,
                                     error: error.message
                                 });
@@ -356,7 +356,7 @@ const changeEmail = async (req, res) => {
                 .catch((error) => {
                     if (error.code === 'auth/wrong-password') {
                         return res.status(500).send({
-                            message: 'Invalid Password',
+                            message: 'Invalid password',
                             status: 500,
                             error: error.message
                         });
@@ -383,16 +383,16 @@ const changePassword = async (req, res) => {
 
         const user = firebaseApp.auth().currentUser;
 
-        const { currentPassword, newPassword, confirmPassword } = req.body;
-
-        if (!(currentPassword && newPassword && confirmPassword)) {
-            return res.status(422).json({
-                message: 'Please Fill Out All Fields',
-                status: 422
-            });
-        }
-
         if (userID) {
+            const { currentPassword, newPassword, confirmPassword } = req.body;
+
+            if (!(currentPassword && newPassword && confirmPassword)) {
+                return res.status(422).json({
+                    message: 'Please Fill Out All Fields',
+                    status: 422
+                });
+            }
+
             if (newPassword !== confirmPassword) {
                 return res.status(422).send({
                     message: 'New Password and Confirm Password is Not Matched',
