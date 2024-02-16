@@ -43,12 +43,14 @@ const getAllUsersAccountProfile = async (req, res, collection) => {
 
 // Get the current user's account profile by login with email and password
 const displayUserAccountProfile = async (req, res, firebase, collection) => {
-    const user = firebase.auth().currentUser;
+    // const user = firebase.auth().currentUser;
+    
+    const user = req.user.uid;
 
     // console.log(req.user.uid);
 
-    if (user && req.user.uid) {
-        await collection.doc(user.uid).get()
+    if (user) {
+        await collection.doc(user).get()
             .then((result) => {
                 if (!result.exists) {
                     res.status(404).send({
