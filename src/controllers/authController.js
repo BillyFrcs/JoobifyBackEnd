@@ -282,6 +282,8 @@ const resetPassword = async (req, res) => {
 
 const changeEmail = async (req, res) => {
     try {
+        const userID = req.user.uid;
+
         const user = firebaseApp.auth().currentUser;
 
         const { newEmail, password } = req.body;
@@ -293,7 +295,7 @@ const changeEmail = async (req, res) => {
             });
         }
 
-        if (user && req.user.uid) {
+        if (userID) {
             const credential = firebaseApp.auth.EmailAuthProvider.credential(
                 user.email,
                 password
@@ -346,7 +348,7 @@ const changeEmail = async (req, res) => {
 
                     const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
 
-                    UsersCollection.doc(user.uid).update({
+                    UsersCollection.doc(userID).update({
                         email: newEmail,
                         updatedAt: getDateAndTime
                     });
@@ -377,6 +379,8 @@ const changeEmail = async (req, res) => {
 
 const changePassword = async (req, res) => {
     try {
+        const userID = req.user.uid;
+
         const user = firebaseApp.auth().currentUser;
 
         const { currentPassword, newPassword, confirmPassword } = req.body;
@@ -388,7 +392,7 @@ const changePassword = async (req, res) => {
             });
         }
 
-        if (user && req.user.uid) {
+        if (userID) {
             if (newPassword !== confirmPassword) {
                 return res.status(422).send({
                     message: 'New Password and Confirm Password is Not Matched',
@@ -431,7 +435,7 @@ const changePassword = async (req, res) => {
 
                     const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
 
-                    UsersCollection.doc(user.uid).update({
+                    UsersCollection.doc(userID).update({
                         updatedAt: getDateAndTime
                     });
                 })
