@@ -31,7 +31,7 @@ const getAllUsersAccountProfile = async (req, res) => {
 // Get the current user's account profile by login with email and password
 const displayUserAccountProfile = async (req, res) => {
     try {
-        UserModel.displayUserAccountProfile(req, res, firebaseApp, UsersCollection);
+        UserModel.displayUserAccountProfile(req, res, UsersCollection);
     } catch (error) {
         res.status(400).send({
             message: 'Something Went Wrong to Display User Account Profile',
@@ -55,6 +55,122 @@ const getUserAccountProfileByID = async (req, res) => {
 };
 
 // Update the current user's account profile by login with email and password
+const updateUserAccountProfile = async (req, res) => {
+    try {
+        // const user = firebaseApp.auth().currentUser;
+        // const userID = user.uid || req.user.uid;
+
+        const user = req.user.uid;
+
+        const form = new formidable.IncomingForm({ multiples: true });
+
+        if (user && req.user.uid) {
+            await UsersCollection.doc(user).get().then(() => {
+                // Default implementation
+                form.parse(req, async (error, fields, files) => {
+                    // Create validation of the fields and files
+                    if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !files.userProfileImage || !fields.about) {
+                        return res.status(422).json({
+                            message: 'Please Fill Out All Fields',
+                            status: 422
+                        });
+                    }
+
+                    const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME;
+
+                    const storagePublicURL = `https://storage.googleapis.com/${bucketName}.appspot.com/`;
+
+                    // const storagePublicURL = `https://firebasestorage.googleapis.com/v0/b/${bucketName}.appspot.com/o/`;
+
+                    // The variable should be match with the name of the key field
+                    const { userProfileImage } = files;
+
+                    // URL of the uploaded image
+                    let imageURL;
+
+                    if (error) {
+                        return res.status(400).json({
+                            message: 'There Was an Error Parsing The Files',
+                            status: 400,
+                            error: error.message
+                        });
+                    }
+
+                    const bucket = CloudStorage.bucket(`gs://${bucketName}.appspot.com`);
+
+                    const id = uuidv4();
+
+                    if (userProfileImage.size === 0) {
+                        res.status(404).send({
+                            message: 'No Image Found',
+                            status: 404
+                        });
+                    } else {
+                        const imageResponse = await bucket.upload(userProfileImage.path, {
+                            destination: `${process.env.USERS_COLLECTION}/${user}/${userProfileImage.name}`,
+                            resumable: true,
+                            metadata: {
+                                metadata: {
+                                    firebaseStorageDownloadTokens: id
+                                }
+                            }
+                        });
+
+                        // Profile image url
+                        // imageURL = `${storagePublicURL + encodeURIComponent(imageResponse[0].name)}?alt=media&token=${id}`;
+
+                        imageURL = storagePublicURL + imageResponse[0].name;
+                    }
+
+                    const date = new Date();
+
+                    const getDateAndTime = date.toLocaleDateString() + ' | ' + date.toLocaleTimeString();
+
+                    // Object to send to the database
+                    const userData = {
+                        name: fields.name,
+                        phoneNumber: fields.phoneNumber,
+                        headline: fields.headline,
+                        location: fields.location,
+                        userProfileImage: userProfileImage.size === 0 ? '' : imageURL,
+                        about: fields.about,
+                        updatedAt: getDateAndTime
+                    };
+
+                    // Added to the firestore collection
+                    await UsersCollection.doc(user).update(userData, { merge: true })
+                        .then(() => {
+                            firebaseApp.auth().currentUser.updateProfile({
+                                displayName: userData.name,
+                                phoneNumber: userData.phoneNumber,
+                                photoURL: userData.userProfileImage
+                            });
+                        })
+                        .then(() => {
+                            res.status(202).send({
+                                message: 'Successfully Update User Profile',
+                                status: 202,
+                                data: userData
+                            });
+                        });
+                });
+            });
+        } else {
+            res.status(403).send({
+                message: 'User is Not Sign In',
+                status: 403
+            });
+        }
+    } catch (error) {
+        res.status(400).send({
+            message: 'Something Went Wrong to Update User Profile',
+            status: 400,
+            error: error.message
+        });
+    }
+};
+
+/*
 const updateUserAccountProfile = async (req, res) => {
     try {
         const user = firebaseApp.auth().currentUser;
@@ -169,6 +285,7 @@ const updateUserAccountProfile = async (req, res) => {
         });
     }
 };
+*/
 
 // Update the user's account profile by id
 const updateUserAccountProfileByID = async (req, res) => {
