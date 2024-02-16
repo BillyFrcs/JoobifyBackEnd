@@ -49,23 +49,6 @@ const displayUserAccountProfile = async (req, res, collection) => {
 
     // console.log(req.user.uid);
 
-    await collection.doc(user).get()
-    .then((result) => {
-        if (!result.exists) {
-            res.status(404).send({
-                message: 'User Profile is Empty',
-                status: 404
-            });
-        } else {
-            res.status(200).send({
-                message: 'Display User Profile',
-                status: 200,
-                data: result.data()
-            });
-        }
-    });
-    
-    /*
     if (user) {
         await collection.doc(user).get()
             .then((result) => {
@@ -88,7 +71,6 @@ const displayUserAccountProfile = async (req, res, collection) => {
             status: 403
         });
     }
-    */
 };
 
 // Get the user's account profile by id
