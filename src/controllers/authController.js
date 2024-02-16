@@ -162,9 +162,11 @@ const signIn = async (req, res) => {
 
 const logOut = async (req, res) => {
     try {
-        const user = firebaseApp.auth().currentUser;
+        // const user = firebaseApp.auth().currentUser;
 
-        if (user && req.user.uid) {
+        const user = req.user.uid;
+
+        if (user) {
             await firebaseApp.auth().signOut().then(() => {
                 res.status(200).send({
                     message: 'Successfully Log Out Account',
