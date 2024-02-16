@@ -58,13 +58,13 @@ const getUserAccountProfileByID = async (req, res) => {
 const updateUserAccountProfile = async (req, res) => {
     try {
         const user = firebaseApp.auth().currentUser;
-        const userID = req.user.uid;
+        const userID = user.uid || req.user.uid;
 
         // const user = req.user.uid;
 
         const form = new formidable.IncomingForm({ multiples: true });
 
-        if (user && userID) {
+        if (user && req.user.uid) {
             await UsersCollection.doc(userID).get().then(() => {
                 // Default implementation
                 form.parse(req, async (error, fields, files) => {
