@@ -70,7 +70,7 @@ const updateUserAccountProfile = async (req, res) => {
                 // Default implementation
                 form.parse(req, async (error, fields, files) => {
                     // Create validation of the fields and files
-                    if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !fields.about) {
+                    if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !fields.about || !files.userProfileImage) {
                         return res.status(422).json({
                             message: 'Please Fill Out All Fields',
                             status: 422
@@ -315,7 +315,7 @@ const updateUserAccountProfileByID = async (req, res) => {
                     // Default implementation
                     form.parse(req, async (error, fields, files) => {
                         // Create validation of the fields and files
-                        if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !files.userProfileImage || !fields.about) {
+                        if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !fields.about || !files.userProfileImage) {
                             return res.status(422).json({
                                 message: 'Please Fill Out All Fields',
                                 status: 422
