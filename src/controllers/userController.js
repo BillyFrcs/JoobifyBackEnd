@@ -61,22 +61,21 @@ const updateUserAccountProfile = async (req, res) => {
         // const userID = user.uid || req.user.uid;
 
         const user = req.user.uid;
+        const userID = user;
 
         if (user) {
             const form = new formidable.IncomingForm({ multiples: true });
 
-            await UsersCollection.doc(user).get().then(() => {
+            await UsersCollection.doc(userID).get().then(() => {
                 // Default implementation
                 form.parse(req, async (error, fields, files) => {
-                    /*
                     // Create validation of the fields and files
-                    if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !files.userProfileImage || !fields.about) {
+                    if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !fields.about) {
                         return res.status(422).json({
                             message: 'Please Fill Out All Fields',
                             status: 422
                         });
                     }
-                    */
 
                     const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME;
 
@@ -111,7 +110,7 @@ const updateUserAccountProfile = async (req, res) => {
                         */
                     } else {
                         const imageResponse = await bucket.upload(userProfileImage.path, {
-                            destination: `${process.env.USERS_COLLECTION}/${user}/${userProfileImage.name}`,
+                            destination: `${process.env.USERS_COLLECTION}/${userID}/${userProfileImage.name}`,
                             resumable: true,
                             metadata: {
                                 metadata: {
@@ -142,7 +141,7 @@ const updateUserAccountProfile = async (req, res) => {
                     };
 
                     // Added to the firestore collection
-                    await UsersCollection.doc(user).update(userData, { merge: true })
+                    await UsersCollection.doc(userID).update(userData, { merge: true })
                         .then(() => {
                             firebaseApp.auth().currentUser.updateProfile({
                                 displayName: userData.name,
@@ -315,7 +314,6 @@ const updateUserAccountProfileByID = async (req, res) => {
                 await UsersCollection.doc(userID).get().then(() => {
                     // Default implementation
                     form.parse(req, async (error, fields, files) => {
-                        /*
                         // Create validation of the fields and files
                         if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !files.userProfileImage || !fields.about) {
                             return res.status(422).json({
@@ -323,7 +321,6 @@ const updateUserAccountProfileByID = async (req, res) => {
                                 status: 422
                             });
                         }
-                        */
 
                         const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME;
 
@@ -350,12 +347,10 @@ const updateUserAccountProfileByID = async (req, res) => {
                         const id = uuidv4();
 
                         if (userProfileImage.size === 0) {
-                            /*
                             res.status(404).send({
                                 message: 'No Image Found',
                                 status: 404
                             });
-                            */
                         } else {
                             const imageResponse = await bucket.upload(userProfileImage.path, {
                                 destination: `${process.env.USERS_COLLECTION}/${userID}/${userProfileImage.name}`,
