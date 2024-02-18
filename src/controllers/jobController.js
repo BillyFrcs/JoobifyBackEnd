@@ -204,6 +204,14 @@ const displayUserJobs = async (req, res) => {
             await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).get().then((value) => {
                 const jobs = value.docs.map((document) => document.data());
 
+                res.status(200).send({
+                    message: 'All User Jobs ',
+                    status: 200,
+                    total: snapshot.data().count,
+                    data: jobs
+                });
+
+                /*
                 // Check if the jobs is empty
                 if (jobs.length !== 0) {
                     res.status(200).send({
@@ -218,6 +226,7 @@ const displayUserJobs = async (req, res) => {
                         status: 404
                     });
                 }
+                */
             });
         } else {
             res.status(403).send({
