@@ -19,9 +19,11 @@ const CloudStorage = new Storage({
 
 const postJob = async (req, res) => {
     try {
-        const user = firebaseApp.auth().currentUser;
+        const user = req.user.uid;
 
-        if (user && req.user.uid) {
+        // const user = firebaseApp.auth().currentUser;
+
+        if (user) {
             const form = new formidable.IncomingForm({ multiples: true });
 
             // Default implementation
@@ -48,7 +50,7 @@ const postJob = async (req, res) => {
                 // URL of the uploaded image
                 let imageURL;
 
-                const userID = user.uid || req.user.uid;
+                const userID = user;
 
                 const jobID = JobsCollection.doc().id;
 
@@ -136,11 +138,13 @@ const postJob = async (req, res) => {
 
 const displayAllUsersJobs = async (req, res) => {
     try {
-        const user = firebaseApp.auth().currentUser;
+        const user = req.user.uid;
 
-        const snapshot = await JobsCollection.count().get();
+        // const user = firebaseApp.auth().currentUser;
 
-        if (user && req.user.uid) {
+        if (user) {
+            const snapshot = await JobsCollection.count().get();
+
             await JobsCollection.get().then((value) => {
                 const jobs = value.docs.map((document) => document.data());
 
@@ -188,12 +192,15 @@ const displayAllJobs = async (req, res) => {
 
 const displayUserJobs = async (req, res) => {
     try {
-        const user = firebaseApp.auth().currentUser;
-        const userID = user.uid || req.user.uid;
+        const user = req.user.uid;
 
-        const snapshot = await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).count().get();
+        // const user = firebaseApp.auth().currentUser;
 
-        if (user && req.user.uid) {
+        const userID = user;
+
+        if (user) {
+            const snapshot = await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).count().get();
+
             await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).get().then((value) => {
                 const jobs = value.docs.map((document) => document.data());
 
@@ -229,10 +236,13 @@ const displayUserJobs = async (req, res) => {
 
 const displayJobDetail = async (req, res) => {
     try {
-        const user = firebaseApp.auth().currentUser;
-        const userID = user.uid || req.user.uid;
+        const user = req.user.uid;
 
-        if (user && req.user.uid) {
+        // const user = firebaseApp.auth().currentUser;
+
+        const userID = user;
+
+        if (user) {
             const jobID = req.params.id;
             const job = await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).doc(jobID).get();
 
@@ -315,11 +325,12 @@ const jobDetail = async (req, res) => {
 
 const updateUserJob = async (req, res) => {
     try {
-        const user = firebaseApp.auth().currentUser;
+        const user = req.user.uid;
+        const userID = user;
 
-        if (user && req.user.uid) {
-            const userID = user.uid || req.user.uid;
+        // const user = firebaseApp.auth().currentUser;
 
+        if (user) {
             const jobID = req.params.id;
             const job = await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).doc(jobID).get();
 
@@ -468,10 +479,13 @@ const deleteJobImageStorage = async (userID, jobID) => {
 
 const deleteUserJob = async (req, res) => {
     try {
-        const user = firebaseApp.auth().currentUser;
-        const userID = user.uid || req.user.uid;
+        const user = req.user.uid;
 
-        if (user && req.user.uid) {
+        // const user = firebaseApp.auth().currentUser;
+
+        const userID = user;
+
+        if (user) {
             const jobID = req.params.id;
             const job = await UsersCollection.doc(userID).collection(process.env.JOBS_COLLECTION).doc(jobID).get();
 
