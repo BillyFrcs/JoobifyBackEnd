@@ -68,6 +68,7 @@ const updateUserAccountProfile = async (req, res) => {
             await UsersCollection.doc(user).get().then(() => {
                 // Default implementation
                 form.parse(req, async (error, fields, files) => {
+                    /*
                     // Create validation of the fields and files
                     if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !files.userProfileImage || !fields.about) {
                         return res.status(422).json({
@@ -75,6 +76,7 @@ const updateUserAccountProfile = async (req, res) => {
                             status: 422
                         });
                     }
+                    */
 
                     const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME;
 
@@ -101,10 +103,12 @@ const updateUserAccountProfile = async (req, res) => {
                     const id = uuidv4();
 
                     if (userProfileImage.size === 0) {
+                        /*
                         res.status(404).send({
                             message: 'No Image Found',
                             status: 404
                         });
+                        */
                     } else {
                         const imageResponse = await bucket.upload(userProfileImage.path, {
                             destination: `${process.env.USERS_COLLECTION}/${user}/${userProfileImage.name}`,
@@ -132,7 +136,7 @@ const updateUserAccountProfile = async (req, res) => {
                         phoneNumber: fields.phoneNumber,
                         headline: fields.headline,
                         location: fields.location,
-                        userProfileImage: userProfileImage.size === 0 ? '' : imageURL,
+                        userProfileImage: userProfileImage.size === 0 ? process.env.DEFAULT_PROFILE_IMAGE_URL : imageURL,
                         about: fields.about,
                         updatedAt: getDateAndTime
                     };
