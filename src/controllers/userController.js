@@ -62,9 +62,9 @@ const updateUserAccountProfile = async (req, res) => {
 
         const user = req.user.uid;
 
-        const form = new formidable.IncomingForm({ multiples: true });
-
         if (user) {
+            const form = new formidable.IncomingForm({ multiples: true });
+
             await UsersCollection.doc(user).get().then(() => {
                 // Default implementation
                 form.parse(req, async (error, fields, files) => {
@@ -182,9 +182,9 @@ const updateUserAccountProfile = async (req, res) => {
 
         // const user = req.user.uid;
 
-        const form = new formidable.IncomingForm({ multiples: true });
-
         if (user && req.user.uid) {
+            const form = new formidable.IncomingForm({ multiples: true });
+
             await UsersCollection.doc(userID).get().then(() => {
                 // Default implementation
                 form.parse(req, async (error, fields, files) => {
@@ -294,14 +294,18 @@ const updateUserAccountProfile = async (req, res) => {
 // Update the user's account profile by id
 const updateUserAccountProfileByID = async (req, res) => {
     try {
+        const user = req.user.uid;
         const userID = req.params.id;
-        const user = firebaseApp.auth().currentUser;
 
-        const profile = await UsersCollection.doc(userID).get();
+        // const user = firebaseApp.auth().currentUser;
 
-        const form = new formidable.IncomingForm({ multiples: true });
+        // const profile = await UsersCollection.doc(userID).get();
 
-        if (user && req.user.uid) {
+        if (user) {
+            const profile = await UsersCollection.doc(userID).get();
+
+            const form = new formidable.IncomingForm({ multiples: true });
+
             if (!profile.exists) {
                 res.status(404).send({
                     message: 'User is Not Found',
@@ -311,6 +315,7 @@ const updateUserAccountProfileByID = async (req, res) => {
                 await UsersCollection.doc(userID).get().then(() => {
                     // Default implementation
                     form.parse(req, async (error, fields, files) => {
+                        /*
                         // Create validation of the fields and files
                         if (!fields.name || !fields.phoneNumber || !fields.headline || !fields.location || !files.userProfileImage || !fields.about) {
                             return res.status(422).json({
@@ -318,6 +323,7 @@ const updateUserAccountProfileByID = async (req, res) => {
                                 status: 422
                             });
                         }
+                        */
 
                         const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME;
 
@@ -344,10 +350,12 @@ const updateUserAccountProfileByID = async (req, res) => {
                         const id = uuidv4();
 
                         if (userProfileImage.size === 0) {
+                            /*
                             res.status(404).send({
                                 message: 'No Image Found',
                                 status: 404
                             });
+                            */
                         } else {
                             const imageResponse = await bucket.upload(userProfileImage.path, {
                                 destination: `${process.env.USERS_COLLECTION}/${userID}/${userProfileImage.name}`,
@@ -375,7 +383,7 @@ const updateUserAccountProfileByID = async (req, res) => {
                             phoneNumber: fields.phoneNumber,
                             headline: fields.headline,
                             location: fields.location,
-                            userProfileImage: userProfileImage.size === 0 ? '' : imageURL,
+                            userProfileImage: userProfileImage.size === 0 ? process.env.DEFAULT_PROFILE_IMAGE_URL : imageURL,
                             about: fields.about,
                             updatedAt: getDateAndTime
                         };
