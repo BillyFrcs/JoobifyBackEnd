@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
         "joobify"
+    ],
+    "circleci.persistedProjectSelection": [
+        "gh/BillyFrcs/JoobifyBackEnd"
     ]
 }
