@@ -1,4 +1,4 @@
-<h1 align="center">Joobify BackEnd<h1>
+<h1 align="center">Joobify Back-End<h1>
 
 <h2>Setup & Installation</h2>
 
